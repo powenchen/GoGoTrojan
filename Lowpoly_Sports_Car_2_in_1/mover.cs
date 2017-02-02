@@ -38,6 +38,10 @@ public class mover : MonoBehaviour
     void Update()
     {
         speedText.text = Mathf.Round(rb.velocity.magnitude * 2.23693629f*10f)/10f + " MPH";
+        frontLeft.transform.Rotate(new Vector3(0, flCollider.rpm / 60 * 360 * Time.deltaTime, 0));
+        frontRight.transform.Rotate(new Vector3(0, frCollider.rpm / 60 * 360 * Time.deltaTime, 0));
+        rearLeft.transform.Rotate(new Vector3(0, rlCollider.rpm / 60 * 360 * Time.deltaTime, 0));
+        rearRight.transform.Rotate(new Vector3(0, rrCollider.rpm / 60 * 360 * Time.deltaTime, 0));
 
         /*if (Input.GetKey(KeyCode.W))
         {
