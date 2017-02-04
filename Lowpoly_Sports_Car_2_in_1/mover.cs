@@ -21,7 +21,7 @@ public class mover : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass =com;
-        speedText.text = "0 MPH";
+        speedText.text = "0 km/h";
         flCollider = frontLeft.GetComponent<WheelCollider>();
         frCollider = frontRight.GetComponent<WheelCollider>();
         rlCollider = rearLeft.GetComponent<WheelCollider>();
@@ -37,7 +37,7 @@ public class mover : MonoBehaviour
     // Update is called once per frame 
     void Update()
     {
-        speedText.text = Mathf.Round(rb.velocity.magnitude * 2.23693629f*10f)/10f + " MPH";
+        speedText.text = Mathf.Round((rb.velocity.magnitude* 3600/1000)*10)/10f + " km/h";
         frontLeft.transform.Rotate(new Vector3(0, flCollider.rpm / 60 * 360 * Time.deltaTime, 0));
         frontRight.transform.Rotate(new Vector3(0, frCollider.rpm / 60 * 360 * Time.deltaTime, 0));
         rearLeft.transform.Rotate(new Vector3(0, rlCollider.rpm / 60 * 360 * Time.deltaTime, 0));
@@ -64,6 +64,7 @@ public class mover : MonoBehaviour
     }
     void FixedUpdate()
     {
+        
         flCollider.motorTorque = frCollider.motorTorque = rlCollider.motorTorque = rrCollider.motorTorque = motorTorque * Input.GetAxis("Vertical");
         flCollider.brakeTorque = frCollider.brakeTorque = rlCollider.brakeTorque = rrCollider.brakeTorque = brakeTorque * Input.GetAxis("Jump");
 
