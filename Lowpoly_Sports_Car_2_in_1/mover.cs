@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 public class mover : MonoBehaviour
 {
+    public Vector3 com;
     public float motorTorque = 10000;
     public float brakeTorque = 20000;
-    private float currentTorque = 0f;
     public float steerRatio = 10;
-    public float speedThreshold;
-    public int stepsBelowThreshold, stepsAboveThreshold;
+    public float speedThreshold=1;
+    public int stepsBelowThreshold=15, stepsAboveThreshold=12;
 
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
     private WheelCollider flCollider, frCollider, rlCollider, rrCollider;
@@ -20,7 +20,7 @@ public class mover : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.centerOfMass = new Vector3(0, 0, 0);
+        rb.centerOfMass =com;
         speedText.text = "0 MPH";
         flCollider = frontLeft.GetComponent<WheelCollider>();
         frCollider = frontRight.GetComponent<WheelCollider>();
@@ -67,8 +67,8 @@ public class mover : MonoBehaviour
         flCollider.motorTorque = frCollider.motorTorque = rlCollider.motorTorque = rrCollider.motorTorque = motorTorque * Input.GetAxis("Vertical");
         flCollider.brakeTorque = frCollider.brakeTorque = rlCollider.brakeTorque = rrCollider.brakeTorque = brakeTorque * Input.GetAxis("Jump");
 
-        flCollider.steerAngle = frCollider.steerAngle = steerRatio * Input.GetAxis("Horizontal");
-        frontRight.transform.rotation = frontLeft.transform.rotation = Quaternion.Euler(90,90,-10 * Input.GetAxis("Horizontal")) ; 
+        flCollider.steerAngle = frCollider.steerAngle =  steerRatio * Input.GetAxis("Horizontal");
 
+       // Debug.Log("motortorque = " + flCollider.motorTorque);
     }
 }
