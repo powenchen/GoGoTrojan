@@ -19,6 +19,7 @@ public class AIScript : MonoBehaviour {
 
     public float speedThreshold = 1;
     public int stepsBelowThreshold = 15, stepsAboveThreshold = 12;
+	public float  forwardStiffness = 5,sidewayStiffness = 10;
 
     public Vector3 com;
     private Rigidbody rb;
@@ -26,6 +27,7 @@ public class AIScript : MonoBehaviour {
     // Use this for initialization
     void Start () {
         speedText.text = "AISpeed: 0 km/h";
+
 
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = com;
@@ -37,7 +39,26 @@ public class AIScript : MonoBehaviour {
         frWheel.ConfigureVehicleSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
         rlWheel.ConfigureVehicleSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
         rrWheel.ConfigureVehicleSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
+
+		ConfigureFriction ();
+
     }
+
+	void ConfigureFriction()
+	{
+		WheelFrictionCurve fFriction = flWheel.forwardFriction, sFriction = flWheel.sidewaysFriction; 
+		fFriction.stiffness = forwardStiffness;
+		sFriction.stiffness = sidewayStiffness;
+
+		flWheel.sidewaysFriction = sFriction;
+		flWheel.forwardFriction = fFriction;
+		frWheel.sidewaysFriction = sFriction;
+		frWheel.forwardFriction = fFriction;
+		rlWheel.sidewaysFriction = sFriction;
+		rlWheel.forwardFriction = fFriction;
+		rrWheel.sidewaysFriction = sFriction;
+		rrWheel.forwardFriction = fFriction;
+	}
 
     private void FixedUpdate()
     {

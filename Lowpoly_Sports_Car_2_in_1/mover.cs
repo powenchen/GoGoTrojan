@@ -16,6 +16,8 @@ public class mover : MonoBehaviour
     public Text speedText;
     private Rigidbody rb;
 
+	public float forwardStiffness = 5,sidewayStiffness =10;
+
     // Use this for initialization 
     void Start()
     {
@@ -31,9 +33,25 @@ public class mover : MonoBehaviour
         frCollider.ConfigureVehicleSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
         rlCollider.ConfigureVehicleSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
         rrCollider.ConfigureVehicleSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-
+		ConfigureFriction ();
     }
 
+
+	void ConfigureFriction()
+	{
+		WheelFrictionCurve fFriction = flCollider.forwardFriction, sFriction = flCollider.sidewaysFriction; 
+		fFriction.stiffness = forwardStiffness;
+		sFriction.stiffness = sidewayStiffness;
+
+		flCollider.sidewaysFriction = sFriction;
+		flCollider.forwardFriction = fFriction;
+		frCollider.sidewaysFriction = sFriction;
+		frCollider.forwardFriction = fFriction;
+		rlCollider.sidewaysFriction = sFriction;
+		rlCollider.forwardFriction = fFriction;
+		rrCollider.sidewaysFriction = sFriction;
+		rrCollider.forwardFriction = fFriction;
+	}
     // Update is called once per frame 
     void Update()
     {

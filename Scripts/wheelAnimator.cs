@@ -11,8 +11,6 @@ public class wheelAnimator : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        transform.Rotate(Vector3.forward * Time.deltaTime * wheel.rpm / 60f * 360f);
-        Debug.Log(wheel.rpm / 60f * 360f * Time.deltaTime);
-        transform.localRotation = Quaternion.Euler(90,270, -wheel.steerAngle);
+		transform.Rotate(Vector3.down * Time.deltaTime * wheel.rpm / 60f * 360f);
     }
 }
