@@ -51,7 +51,8 @@ public class mover : MonoBehaviour
     }
     void FixedUpdate()
     {
-        float motorTorque = maxMotorTorque * Input.GetAxis("Vertical") , brakeTorque = maxBrakeTorque * Input.GetAxis("Jump") ;
+        float motorTorque = maxMotorTorque* Input.GetAxis("Vertical");
+        float brakeTorque = maxBrakeTorque * Input.GetAxis("Jump") ;
         flController.ApplyThrottle(motorTorque);
         frController.ApplyThrottle(motorTorque);
         rlController.ApplyThrottle(motorTorque);
@@ -62,7 +63,7 @@ public class mover : MonoBehaviour
         frController.ApplyBrake(brakeTorque);
         rlController.ApplyBrake(brakeTorque);
         rrController.ApplyBrake(brakeTorque);
-        
+
 
         float steerAngle = steerRatio * Input.GetAxis("Horizontal");
 
