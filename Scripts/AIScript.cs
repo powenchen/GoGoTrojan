@@ -33,10 +33,16 @@ public class AIScript : MonoBehaviour {
     public float frontSensorAngle = 15;
     public float avoidSpeed = 10;
     private int flag = 0;
+    private bool reversing = false;
+    public float reverseTimer = 0;
+    public float waitToReverse = 2;
+    public float reverseFor = 1.5f;
+    public float stuckThreshlod = 10 * 1000 / 3600;//(10 km/h)
 
     // Use this for initialization
     void Start () {
-        speedText.text = "AISpeed: 0 km/h";
+        if(speedText !=null)
+            speedText.text = "AISpeed: 0 km/h";
 
 
         rb = GetComponent<Rigidbody>();
@@ -64,12 +70,19 @@ public class AIScript : MonoBehaviour {
 
     private void Update()
     {
-        float speed = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f;
-        speedText.text = "AISpeed: " + speed + " km/h";
+
+        if (speedText != null)
+        { 
+            float speed = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f;
+            speedText.text = "AISpeed: " + speed + " km/h";
+        }
     }
 
     private void FixedUpdate()
     {
+
+        Debug.Log("throttle = "+frontLeft.GetComponent<WheelCollider>().motorTorque + ", brake = "+ frontLeft.GetComponent<WheelCollider>().brakeTorque);
+
         if (pathPointIdx >= pathPoints.Length)
         {
             flController.ApplyBrake(maxBrakeTorque);
@@ -78,11 +91,8 @@ public class AIScript : MonoBehaviour {
             rrController.ApplyBrake(maxBrakeTorque);
             return;
         }
-        if (flag == 0)
-        {
             if (pathPointIdx < pathPoints.Length)
             {
-                bool isReverse = false;
                 int bestIdx = pathPointIdx;
 
                 Vector3 bestPoint = transform.InverseTransformPoint(new Vector3(
@@ -107,15 +117,9 @@ public class AIScript : MonoBehaviour {
                     }
                 }
 
-                if (bestPoint.z < -distThreshold)
-                {
-                    isReverse = true;
-                }
-                else
-                {
-                    pathPointIdx = bestIdx;
-                    Debug.Log("go to point" + bestIdx);
-                }
+                pathPointIdx = bestIdx;
+                Debug.Log("go to point" + bestIdx);
+                
 
 
 
@@ -126,45 +130,55 @@ public class AIScript : MonoBehaviour {
                                                             ));
 
                 //Debug.Log(steerVector.ToString());
-                float newSteer = maxSteer * (steerVector.x / steerVector.magnitude);
 
-                float newMotorTorque = maxMotorTorque * (1 - Mathf.Abs(steerVector.x / steerVector.magnitude));
 
-                if (isReverse)
-                {
-                    Debug.Log("isReverse; go to point" + bestPoint.x + "," + bestPoint.z);
-                    flController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
-                    frController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
-
-                    flController.ApplyThrottle(-maxMotorTorque * 0.5f);
-                    frController.ApplyThrottle(-maxMotorTorque * 0.5f);
-                    rlController.ApplyThrottle(-maxMotorTorque * 0.5f);
-                    rrController.ApplyThrottle(-maxMotorTorque * 0.5f);
-                }
-                else if (bestPoint.magnitude < distThreshold)
+                if (bestPoint.magnitude < distThreshold)
                 {
                     Debug.Log("passed point" + pathPointIdx + "[" + pathPoints[pathPointIdx].position.x + "," + pathPoints[pathPointIdx].position.y + "," + pathPoints[pathPointIdx].position.z + "]");
 
                     ++pathPointIdx;
+                    
                 }
 
-                else
+                float newSteer = maxSteer * (steerVector.x / steerVector.magnitude);
+
+            float newMotorTorque = maxMotorTorque;// * (1 - Mathf.Abs(steerVector.x / steerVector.magnitude));
+
+                if (reversing)
+                {
+                    newMotorTorque *= -1;
+                }
+
+            /*if (isReverse)
+            {
+                Debug.Log("isReverse; go to point" + bestPoint.x + "," + bestPoint.z);
+                flController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
+                frController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
+
+                flController.ApplyThrottle(-maxMotorTorque * 0.5f);
+                frController.ApplyThrottle(-maxMotorTorque * 0.5f);
+                rlController.ApplyThrottle(-maxMotorTorque * 0.5f);
+                rrController.ApplyThrottle(-maxMotorTorque * 0.5f);
+            }
+            else*/
+                if (flag == 0)
                 {
                     flController.ApplySteer(newSteer);
                     frController.ApplySteer(newSteer);
-
-                    flController.ApplyThrottle(newMotorTorque);
-                    frController.ApplyThrottle(newMotorTorque);
-                    rlController.ApplyThrottle(newMotorTorque);
-                    rrController.ApplyThrottle(newMotorTorque);
                 }
+
+                flController.ApplyThrottle(newMotorTorque);
+                frController.ApplyThrottle(newMotorTorque);
+                rlController.ApplyThrottle(newMotorTorque);
+                rrController.ApplyThrottle(newMotorTorque);
+                
             }
             if (rb.velocity.magnitude > topSpeed)
             {
                 float slowDownRatio = rb.velocity.magnitude / topSpeed;
                 rb.velocity /= slowDownRatio;
             }
-        }
+        
 
         Sensor();
     }
@@ -276,6 +290,32 @@ public class AIScript : MonoBehaviour {
                     avoidSensitivity = -1;
                 }
                 Debug.DrawLine(pos, hit.point, Color.white);
+            }
+        }
+
+        if (rb.velocity.magnitude < stuckThreshlod && !reversing)
+        {
+            reverseTimer += Time.deltaTime;
+            if (reverseTimer >= waitToReverse)
+            {
+                reverseTimer = 0;
+                reversing = true;
+            }
+        }
+        else if (!reversing)
+        {
+            reverseTimer = 0;
+        }
+
+        if (reversing)
+        {
+            Debug.Log("reversing");
+            reverseTimer += Time.deltaTime;
+            avoidSensitivity *= -1;
+            if (reverseTimer >= reverseFor)
+            {
+                reverseTimer = 0;
+                reversing = false;
             }
         }
 
