@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+
 public class AIScript : MonoBehaviour {
     public float maxSteer = 15.0f;
     public float maxMotorTorque = 5000.0f;
