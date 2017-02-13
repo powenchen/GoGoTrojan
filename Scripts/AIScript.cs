@@ -83,7 +83,7 @@ public class AIScript : MonoBehaviour {
     private void FixedUpdate()
     {
 
-        Debug.Log("throttle = "+frontLeft.GetComponent<WheelCollider>().motorTorque + ", brake = "+ frontLeft.GetComponent<WheelCollider>().brakeTorque);
+        Debug.Log("steer = "+frontLeft.GetComponent<WheelCollider>().steerAngle + ", brake = "+ frontLeft.GetComponent<WheelCollider>().brakeTorque);
 
         if (pathPointIdx >= pathPoints.Length)
         {
@@ -111,7 +111,7 @@ public class AIScript : MonoBehaviour {
                                                             ));
                     if (point.z > 0)
                     {
-                        if ((point.x / point.z) < (bestPoint.x / bestPoint.z))
+                        if (Mathf.Abs(point.x / point.z) < Mathf.Abs(bestPoint.x / bestPoint.z))
                         {
                             bestPoint = point;
                             bestIdx = i;
@@ -119,8 +119,13 @@ public class AIScript : MonoBehaviour {
                     }
                 }
 
+            if (pathPointIdx != bestIdx)
+            {
                 pathPointIdx = bestIdx;
                 Debug.Log("go to point" + bestIdx);
+
+            }
+
                 
 
 

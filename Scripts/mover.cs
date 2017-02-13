@@ -23,11 +23,17 @@ public class mover : MonoBehaviour
     public float N2OTime = 3;
     public ParticleSystem[] N2OParticles;
     
+    private float pathUpdateThreshold = 20;
+    public int pathIdx = 1;
+    public GameObject pathObject;
+    private Transform[] pathArray;
+    private float stuckSpeedThres = 3;
 
     // Use this for initialization 
     void Start()
     {
-       
+
+        pathArray = pathObject.GetComponentsInChildren<Transform>();
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass =com;
         if (speedText != null)
@@ -54,6 +60,65 @@ public class mover : MonoBehaviour
     // Update is called once per frame 
     void Update()
     {
+        if (transform.rotation.eulerAngles.x > 180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 Mathf.Clamp(transform.rotation.eulerAngles.x, 335, 360),
+                 transform.rotation.eulerAngles.y,
+                 transform.rotation.eulerAngles.z
+                 );
+        }
+        else if (transform.rotation.eulerAngles.x <180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 Mathf.Clamp(transform.rotation.eulerAngles.x, 0, 25),
+                 transform.rotation.eulerAngles.y,
+                 transform.rotation.eulerAngles.z
+                 );
+        }
+
+        if (transform.rotation.eulerAngles.z > 180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 transform.rotation.eulerAngles.x,
+                 transform.rotation.eulerAngles.y,
+                 Mathf.Clamp(transform.rotation.eulerAngles.z, 335, 360)
+                 );
+        }
+        else if (transform.rotation.eulerAngles.z < 180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 transform.rotation.eulerAngles.x,
+                 transform.rotation.eulerAngles.y,
+                 Mathf.Clamp(transform.rotation.eulerAngles.z, 0, 25)
+                 );
+        }
+
+        float deviateAngle = transform.localEulerAngles.y - (pathArray[pathIdx+1].position.y - pathArray[pathIdx].position.y);
+
+       // Debug.Log("transform.localEulerAngles = "+transform.localEulerAngles.ToString()+ " deviate angle = " + deviateAngle);
+        if ((transform.position - pathArray[pathIdx].position).magnitude < pathUpdateThreshold && pathIdx+1 < pathArray.Length)
+        {
+           // Debug.Log("passed path point" + (pathIdx) + pathArray[pathIdx].position.ToString());
+            pathIdx++;
+        }
+        int bestIdx = pathIdx;
+        float bestDist = (transform.position - pathArray[bestIdx].position).magnitude;
+        for (int i = pathIdx + 1; i < pathArray.Length; ++i)
+        {
+            if ((transform.position - pathArray[i].position).magnitude < bestDist)
+            {
+                bestIdx = i;
+                bestDist = (transform.position - pathArray[bestIdx].position).magnitude;
+            }
+        }
+        if (pathIdx != bestIdx)
+        {
+            //Debug.Log("go to  path point" + (bestIdx));
+            pathIdx = bestIdx;
+
+        }
+
         if (speedText != null)
         {
             speedText.text = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f + " km/h";
@@ -61,6 +126,10 @@ public class mover : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (rb.velocity.magnitude < stuckSpeedThres)
+        {
+
+        }
         if (Input.GetKeyDown(KeyCode.N) && isN2OReady)
         {
             StartCoroutine(Nitrous());
