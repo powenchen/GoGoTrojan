@@ -15,18 +15,25 @@ public class mover : MonoBehaviour
     public Text speedText;
     public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
 
-
+    private bool isN2OReady  = true;
     private Rigidbody rb;
     private WheelController flController, frController, rlController, rrController;
+    public float N2OPower = 2;
+
+    public float N2OTime = 3;
+    public ParticleSystem[] N2OParticles;
     
 
     // Use this for initialization 
     void Start()
     {
+       
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass =com;
-        speedText.text = "0 km/h";
-
+        if (speedText != null)
+        {
+            speedText.text = "0 km/h";
+        }
         flController = frontLeft.GetComponent<WheelController>();
         frController = frontRight.GetComponent<WheelController>();
         rlController = rearLeft.GetComponent<WheelController>();
@@ -47,11 +54,18 @@ public class mover : MonoBehaviour
     // Update is called once per frame 
     void Update()
     {
-        speedText.text = Mathf.Round((rb.velocity.magnitude* 3600/1000)*10)/10f + " km/h";
+        if (speedText != null)
+        {
+            speedText.text = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f + " km/h";
+        }
     }
     void FixedUpdate()
     {
-        float motorTorque = maxMotorTorque * Input.GetAxis("Vertical");
+        if (Input.GetKeyDown(KeyCode.N) && isN2OReady)
+        {
+            StartCoroutine(Nitrous());
+        }
+        float motorTorque = maxMotorTorque;// * Input.GetAxis("Vertical");
         float brakeTorque = maxBrakeTorque * Input.GetAxis("Jump") ;
         flController.ApplyThrottle(motorTorque);
         frController.ApplyThrottle(motorTorque);
@@ -85,5 +99,29 @@ public class mover : MonoBehaviour
     public void removeDebuff(float debuffRatio)
     {
         topSpeed *= debuffRatio;
+    }
+
+    private IEnumerator Nitrous()
+    {
+        isN2OReady = false;
+        int i = 0;
+        foreach (ParticleSystem N2O in N2OParticles)
+        {
+            Debug.Log("nitro"+(++i)+" is activated");
+            N2O.Play();
+        }
+        
+        maxMotorTorque *= N2OPower; 
+        rb.AddForce(transform.forward * N2OPower, ForceMode.Acceleration);
+        yield return new WaitForSeconds(N2OTime);
+        maxMotorTorque /= N2OPower;
+
+        foreach (ParticleSystem N2O in N2OParticles)
+        {
+            N2O.Stop();
+        }
+        isN2OReady = true;
+
+
     }
 }
