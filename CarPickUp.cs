@@ -10,7 +10,7 @@ public class CarPickUp : MonoBehaviour {
 	public Button backText;
 	public Button storeText;
 
-	public static int whichCar = 1;
+	public static int whichCar = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -25,7 +25,7 @@ public class CarPickUp : MonoBehaviour {
 	}
 
 	public void Confirm() {
-		//SceneManager.LoadScene("CharacterPickUp");
+		SceneManager.LoadScene("race");
 	}
 
 	public void GoBack() {
