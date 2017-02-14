@@ -8,10 +8,7 @@ public class mover : MonoBehaviour
     public float maxMotorTorque = 10000;
     public float maxBrakeTorque = 20000;
     public float steerRatio = 10;
-    public float speedThreshold=1;
-    public int stepsBelowThreshold=15, stepsAboveThreshold=12;
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
-    public float forwardStiffness = 5, sidewayStiffness = 10;
     public Text speedText;
     public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
 
@@ -45,14 +42,6 @@ public class mover : MonoBehaviour
         rlController = rearLeft.GetComponent<WheelController>();
         rrController = rearRight.GetComponent<WheelController>();
         
-        flController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        flController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-        frController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        frController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-        rlController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        rlController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-        rrController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        rrController.ConfigureFriction(forwardStiffness, sidewayStiffness);
     }
 
 
@@ -93,8 +82,6 @@ public class mover : MonoBehaviour
                  Mathf.Clamp(transform.rotation.eulerAngles.z, 0, 25)
                  );
         }
-
-        float deviateAngle = transform.localEulerAngles.y - (pathArray[pathIdx+1].position.y - pathArray[pathIdx].position.y);
 
        // Debug.Log("transform.localEulerAngles = "+transform.localEulerAngles.ToString()+ " deviate angle = " + deviateAngle);
         if ((transform.position - pathArray[pathIdx].position).magnitude < pathUpdateThreshold && pathIdx+1 < pathArray.Length)
@@ -180,10 +167,10 @@ public class mover : MonoBehaviour
             N2O.Play();
         }
         
-        maxMotorTorque *= N2OPower; 
+        //maxMotorTorque *= N2OPower; 
         rb.AddForce(transform.forward * N2OPower, ForceMode.Acceleration);
         yield return new WaitForSeconds(N2OTime);
-        maxMotorTorque /= N2OPower;
+       // maxMotorTorque /= N2OPower;
 
         foreach (ParticleSystem N2O in N2OParticles)
         {

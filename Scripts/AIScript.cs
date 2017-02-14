@@ -18,9 +18,6 @@ public class AIScript : MonoBehaviour {
     private Transform[] pathPoints;
     private int pathPointIdx = 1; // start from 1 since idx = 0 is parent component 
 
-    public float speedThreshold = 1;
-    public int stepsBelowThreshold = 15, stepsAboveThreshold = 12;
-	public float  forwardStiffness = 5,sidewayStiffness = 10;
     public int nextSteps = 3;
 
     public Vector3 com;
@@ -57,16 +54,7 @@ public class AIScript : MonoBehaviour {
         flController = frontLeft.GetComponent<WheelController>();
         frController = frontRight.GetComponent<WheelController>();
         rlController = rearLeft.GetComponent<WheelController>();
-        rrController = rearRight.GetComponent<WheelController>();
-
-        flController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        flController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-        frController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        frController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-        rlController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        rlController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-        rrController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-        rrController.ConfigureFriction(forwardStiffness, sidewayStiffness);
+		rrController = rearRight.GetComponent<WheelController> ();
 
     }
 
@@ -83,7 +71,7 @@ public class AIScript : MonoBehaviour {
     private void FixedUpdate()
     {
 
-        Debug.Log("steer = "+frontLeft.GetComponent<WheelCollider>().steerAngle + ", brake = "+ frontLeft.GetComponent<WheelCollider>().brakeTorque);
+		Debug.Log("steer = "+frontLeft.GetComponent<WheelCollider>().steerAngle + ", motor torque = "+ frontLeft.GetComponent<WheelCollider>().motorTorque);
 
         if (pathPointIdx >= pathPoints.Length)
         {
