@@ -25,6 +25,8 @@ public class mover : MonoBehaviour
     public GameObject pathObject;
     private Transform[] pathArray;
     private float stuckSpeedThres = 3;
+    private float N2OTimer = 0;
+    private bool isN2OEmitting = false;
 
     // Use this for initialization 
     void Start()
@@ -113,13 +115,33 @@ public class mover : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if (rb.velocity.magnitude < stuckSpeedThres)
+        if (Input.GetKeyDown(KeyCode.N) && isN2OReady && !isN2OEmitting)
         {
-
+            isN2OReady = false;
+            isN2OEmitting = true;
+            foreach (ParticleSystem N2O in N2OParticles)
+            {
+                N2O.Play();
+            }
+            N2OTimer = Time.time;
         }
-        if (Input.GetKeyDown(KeyCode.N) && isN2OReady)
+        if (isN2OEmitting)
         {
-            StartCoroutine(Nitrous());
+            if (Time.time - N2OTimer < N2OTime)
+            {
+                rb.AddForce(transform.forward * N2OPower, ForceMode.Acceleration);
+            }
+            else
+            {
+                isN2OReady = true;
+                isN2OEmitting = false;
+                foreach (ParticleSystem N2O in N2OParticles)
+                {
+                    N2O.Stop();
+                }
+                N2OTimer = 0;
+
+            }
         }
         float motorTorque = maxMotorTorque;// * Input.GetAxis("Vertical");
         float brakeTorque = maxBrakeTorque * Input.GetAxis("Jump") ;
@@ -156,28 +178,5 @@ public class mover : MonoBehaviour
     {
         topSpeed *= debuffRatio;
     }
-
-    private IEnumerator Nitrous()
-    {
-        isN2OReady = false;
-        int i = 0;
-        foreach (ParticleSystem N2O in N2OParticles)
-        {
-            Debug.Log("nitro"+(++i)+" is activated");
-            N2O.Play();
-        }
-        
-        //maxMotorTorque *= N2OPower; 
-        rb.AddForce(transform.forward * N2OPower, ForceMode.Acceleration);
-        yield return new WaitForSeconds(N2OTime);
-       // maxMotorTorque /= N2OPower;
-
-        foreach (ParticleSystem N2O in N2OParticles)
-        {
-            N2O.Stop();
-        }
-        isN2OReady = true;
-
-
-    }
+    
 }

@@ -99,7 +99,7 @@ public class AIScript : MonoBehaviour {
                                                             ));
                     if (point.z > 0)
                     {
-                        if (Mathf.Abs(point.x / point.z) < Mathf.Abs(bestPoint.x / bestPoint.z))
+                        if (Mathf.Abs(point.x / point.z) < Mathf.Abs(bestPoint.x / bestPoint.z) && point.magnitude < bestPoint.magnitude)
                         {
                             bestPoint = point;
                             bestIdx = i;
@@ -202,10 +202,10 @@ public class AIScript : MonoBehaviour {
         if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
-            flController.ApplyBrake(maxBrakeTorque * 0.2f);
+            /*flController.ApplyBrake(maxBrakeTorque * 0.2f);
             frController.ApplyBrake(maxBrakeTorque * 0.2f);
             rlController.ApplyBrake(maxBrakeTorque * 0.2f);
-            rrController.ApplyBrake(maxBrakeTorque * 0.2f);
+            rrController.ApplyBrake(maxBrakeTorque * 0.2f);*/
             Debug.DrawLine(pos, hit.point, Color.red);
         }
         else
