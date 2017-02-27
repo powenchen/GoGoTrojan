@@ -17,9 +17,7 @@ public class AIScript : MonoBehaviour {
     public GameObject path;
     private Transform[] pathPoints;
     private int pathPointIdx = 1; // start from 1 since idx = 0 is parent component 
-
-    public int nextSteps = 3;
-
+    
     public Vector3 com;
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
     private Rigidbody rb;
@@ -71,7 +69,7 @@ public class AIScript : MonoBehaviour {
     private void FixedUpdate()
     {
 
-		Debug.Log("steer = "+frontLeft.GetComponent<WheelCollider>().steerAngle + ", motor torque = "+ frontLeft.GetComponent<WheelCollider>().motorTorque);
+        //Debug.Log("steer = "+frontLeft.GetComponent<WheelCollider>().steerAngle + ", motor torque = "+ frontLeft.GetComponent<WheelCollider>().motorTorque);
 
         if (pathPointIdx >= pathPoints.Length)
         {
@@ -81,15 +79,17 @@ public class AIScript : MonoBehaviour {
             rrController.ApplyBrake(maxBrakeTorque);
             return;
         }
-            if (pathPointIdx < pathPoints.Length)
-            {
-                int bestIdx = pathPointIdx;
-
-                Vector3 bestPoint = transform.InverseTransformPoint(new Vector3(
+        Vector3 nextPoint = transform.InverseTransformPoint(new Vector3(
                                                             pathPoints[pathPointIdx].position.x,
                                                             transform.position.y,
                                                             pathPoints[pathPointIdx].position.z
                                                             ));
+        /*
+            if (pathPointIdx < pathPoints.Length)
+            {
+                int bestIdx = pathPointIdx;
+
+                
                 for (int i = pathPointIdx + 1; i < pathPoints.Length && i < pathPointIdx + nextSteps; ++i)
                 {
                     Vector3 point = transform.InverseTransformPoint(new Vector3(
@@ -110,70 +110,63 @@ public class AIScript : MonoBehaviour {
             if (pathPointIdx != bestIdx)
             {
                 pathPointIdx = bestIdx;
-                Debug.Log("go to point" + bestIdx);
+                Debug.Log("AI go to point" + bestIdx);
 
             }
 
                 
-
-
-
-                Vector3 steerVector = transform.InverseTransformPoint(new Vector3(
+        */
+        
+        Vector3 steerVector = transform.InverseTransformPoint(new Vector3(
                                                             pathPoints[pathPointIdx].position.x,
                                                             transform.position.y,
                                                             pathPoints[pathPointIdx].position.z
                                                             ));
 
-                //Debug.Log(steerVector.ToString());
+        if (nextPoint.magnitude < distThreshold)
+        {
+            Debug.Log("AI passed point" + pathPointIdx + "[" + pathPoints[pathPointIdx].position.x + "," + pathPoints[pathPointIdx].position.y + "," + pathPoints[pathPointIdx].position.z + "]");
+            ++pathPointIdx;
+        }
+
+        float newSteer = maxSteer * (steerVector.x / steerVector.magnitude);
+
+        float newMotorTorque = maxMotorTorque;// * (1 - Mathf.Abs(steerVector.x / steerVector.magnitude));
+
+        if (reversing)
+        {
+            newMotorTorque *= -1;
+        }
+
+        /*if (isReverse)
+        {
+            Debug.Log("isReverse; go to point" + bestPoint.x + "," + bestPoint.z);
+            flController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
+            frController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
+
+            flController.ApplyThrottle(-maxMotorTorque * 0.5f);
+            frController.ApplyThrottle(-maxMotorTorque * 0.5f);
+            rlController.ApplyThrottle(-maxMotorTorque * 0.5f);
+            rrController.ApplyThrottle(-maxMotorTorque * 0.5f);
+        }
+        else*/
+        if (flag == 0)
+        {
+            flController.ApplySteer(newSteer);
+            frController.ApplySteer(newSteer);
+        }
+
+        flController.ApplyThrottle(newMotorTorque);
+        frController.ApplyThrottle(newMotorTorque);
+        rlController.ApplyThrottle(newMotorTorque);
+        rrController.ApplyThrottle(newMotorTorque);
 
 
-                if (bestPoint.magnitude < distThreshold)
-                {
-                    Debug.Log("passed point" + pathPointIdx + "[" + pathPoints[pathPointIdx].position.x + "," + pathPoints[pathPointIdx].position.y + "," + pathPoints[pathPointIdx].position.z + "]");
-
-                    ++pathPointIdx;
-                    
-                }
-
-                float newSteer = maxSteer * (steerVector.x / steerVector.magnitude);
-
-            float newMotorTorque = maxMotorTorque;// * (1 - Mathf.Abs(steerVector.x / steerVector.magnitude));
-
-                if (reversing)
-                {
-                    newMotorTorque *= -1;
-                }
-
-            /*if (isReverse)
-            {
-                Debug.Log("isReverse; go to point" + bestPoint.x + "," + bestPoint.z);
-                flController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
-                frController.ApplySteer(-maxSteer * Mathf.Sign(newSteer));
-
-                flController.ApplyThrottle(-maxMotorTorque * 0.5f);
-                frController.ApplyThrottle(-maxMotorTorque * 0.5f);
-                rlController.ApplyThrottle(-maxMotorTorque * 0.5f);
-                rrController.ApplyThrottle(-maxMotorTorque * 0.5f);
-            }
-            else*/
-                if (flag == 0)
-                {
-                    flController.ApplySteer(newSteer);
-                    frController.ApplySteer(newSteer);
-                }
-
-                flController.ApplyThrottle(newMotorTorque);
-                frController.ApplyThrottle(newMotorTorque);
-                rlController.ApplyThrottle(newMotorTorque);
-                rrController.ApplyThrottle(newMotorTorque);
-                
-            }
-            if (rb.velocity.magnitude > topSpeed)
-            {
-                float slowDownRatio = rb.velocity.magnitude / topSpeed;
-                rb.velocity /= slowDownRatio;
-            }
-        
+        if (rb.velocity.magnitude > topSpeed)
+        {
+            float slowDownRatio = rb.velocity.magnitude / topSpeed;
+            rb.velocity /= slowDownRatio;
+        }
 
         Sensor();
     }
