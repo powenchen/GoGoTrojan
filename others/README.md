@@ -1,0 +1,2 @@
+# GoGoTrojan
+/Assets
