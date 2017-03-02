@@ -7,7 +7,7 @@ public class mover : MonoBehaviour
     public Vector3 com = new Vector3(0,0,0);
     public float maxMotorTorque = 10000;
     public float maxBrakeTorque = 20000;
-    public float steerRatio = 10;
+    public float maxSteerAngle = 10;
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
     public Text speedText;
     public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
@@ -90,16 +90,6 @@ public class mover : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.N) && isN2OReady && !isN2OEmitting)
-        {
-            isN2OReady = false;
-            isN2OEmitting = true;
-            foreach (ParticleSystem N2O in N2OParticles)
-            {
-                N2O.Play();
-            }
-            N2OTimer = Time.time;
-        }
         if (isN2OEmitting)
         {
             if (Time.time - N2OTimer < N2OTime)
@@ -118,25 +108,7 @@ public class mover : MonoBehaviour
 
             }
         }
-        float motorTorque = maxMotorTorque;// * Input.GetAxis("Vertical");
-        float brakeTorque = maxBrakeTorque * Input.GetAxis("Jump") ;
-        flController.ApplyThrottle(motorTorque);
-        frController.ApplyThrottle(motorTorque);
-        rlController.ApplyThrottle(motorTorque);
-        rrController.ApplyThrottle(motorTorque);
         
-        
-        flController.ApplyBrake(brakeTorque);
-        frController.ApplyBrake(brakeTorque);
-        rlController.ApplyBrake(brakeTorque);
-        rrController.ApplyBrake(brakeTorque);
-
-
-        float steerAngle = steerRatio *Input.GetAxis("Horizontal");// Input.acceleration.x;//
-
-        flController.ApplySteer(steerAngle);
-        frController.ApplySteer(steerAngle);
-
         if (rb.velocity.magnitude > topSpeed)
         {
             float slowDownRatio = rb.velocity.magnitude / topSpeed;
@@ -154,12 +126,48 @@ public class mover : MonoBehaviour
         topSpeed *= debuffRatio;
     }
 
-    public void ApplyBrake()
+    public void ApplyThrottle(float throttleFactor)
     {
-        flController.ApplyBrake(maxBrakeTorque);
-        frController.ApplyBrake(maxBrakeTorque);
-        rlController.ApplyBrake(maxBrakeTorque);
-        rrController.ApplyBrake(maxBrakeTorque);
+        flController.ApplyThrottle(maxMotorTorque * throttleFactor);
+        frController.ApplyThrottle(maxMotorTorque * throttleFactor);
+        rlController.ApplyThrottle(maxMotorTorque * throttleFactor);
+        rrController.ApplyThrottle(maxMotorTorque * throttleFactor);
     }
-    
+
+    public void ApplyBrake(float brakeFactor)
+    {
+        flController.ApplyBrake(maxBrakeTorque* brakeFactor);
+        frController.ApplyBrake(maxBrakeTorque* brakeFactor);
+        rlController.ApplyBrake(maxBrakeTorque* brakeFactor);
+        rrController.ApplyBrake(maxBrakeTorque* brakeFactor);
+    }
+
+    public void ApplyN2O()
+    {
+        if(isN2OReady && !isN2OEmitting)
+        {
+            isN2OReady = false;
+            isN2OEmitting = true;
+            foreach (ParticleSystem N2O in N2OParticles)
+            {
+                N2O.Play();
+            }
+            N2OTimer = Time.time;
+        }
+    }
+
+    public void ApplyPedal(float motorTorqueFactor, float brakeTorqueFactor)
+    {
+        ApplyBrake(brakeTorqueFactor);
+        ApplyThrottle(motorTorqueFactor);
+    }
+
+    public void ApplySteer(float steerFactor)
+    {
+        float steerAngle = steerFactor * maxSteerAngle;
+        flController.ApplySteer(steerAngle);
+        frController.ApplySteer(steerAngle);
+    }
+
+
 }

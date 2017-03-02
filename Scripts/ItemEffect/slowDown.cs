@@ -17,11 +17,7 @@ public class slowDown : MonoBehaviour {
     private void OnTriggerEnter(Collider other)
     {
        // Debug.Log("triggered!!! tag = "+other.tag);
-        if (other.CompareTag("Enemy") )
-        {
-            other.transform.root.GetComponent<AIScript>().speedDebuff(slowDownRatio);
-        }
-        else if(other.CompareTag("Player"))
+        if (other.CompareTag("Enemy") || other.CompareTag("Player"))
         {
             other.transform.root.GetComponent<mover>().speedDebuff(slowDownRatio);
         }
@@ -29,12 +25,7 @@ public class slowDown : MonoBehaviour {
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Enemy"))
-        {
-
-            other.transform.root.GetComponent<AIScript>().removeDebuff(slowDownRatio);
-        }
-        else if (other.CompareTag("Player"))
+        if (other.CompareTag("Enemy")||other.CompareTag("Player"))
         {
             other.transform.root.GetComponent<mover>().removeDebuff(slowDownRatio);
         }
