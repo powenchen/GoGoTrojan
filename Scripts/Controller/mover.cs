@@ -4,116 +4,162 @@ using UnityEngine.UI;
 
 public class mover : MonoBehaviour
 {
-	public Vector3 com = new Vector3(0,0,0);
-	public float maxMotorTorque = 10000;
-	public float maxBrakeTorque = 20000;
-	public float steerRatio = 10;
-	public float speedThreshold=1;
-	public int stepsBelowThreshold=15, stepsAboveThreshold=12;
-	public GameObject frontLeft, frontRight, rearLeft, rearRight;
-	public float forwardStiffness = 5, sidewayStiffness = 10;
-	public Text speedText;
-	public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
+    public Vector3 com = new Vector3(0,0,0);
+    public float maxMotorTorque = 10000;
+    public float maxBrakeTorque = 20000;
+    public float steerRatio = 10;
+    public GameObject frontLeft, frontRight, rearLeft, rearRight;
+    public Text speedText;
+    public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
 
-	private bool canStartRacing = false;
-	private bool isGameOver = false;
+    private bool isN2OReady  = true;
+    private Rigidbody rb;
+    private WheelController flController, frController, rlController, rrController;
+    public float N2OPower = 2;
 
+    public float N2OTime = 3;
+    public ParticleSystem[] N2OParticles;
+    
+    
 
-	private Rigidbody rb;
-	private WheelController flController, frController, rlController, rrController;
+    //private float stuckSpeedThres = 3;
+    private float N2OTimer = 0;
+    private bool isN2OEmitting = false;
 
-
-	// Use this for initialization 
-	void Start()
-	{
-		rb = GetComponent<Rigidbody>();
-		rb.centerOfMass =com;
-		speedText.text = "0 km/h";
-
-		flController = frontLeft.GetComponent<WheelController>();
-		frController = frontRight.GetComponent<WheelController>();
-		rlController = rearLeft.GetComponent<WheelController>();
-		rrController = rearRight.GetComponent<WheelController>();
-
-		flController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-		flController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-		frController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-		frController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-		rlController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-		rlController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-		rrController.ConfigureWheelSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
-		rrController.ConfigureFriction(forwardStiffness, sidewayStiffness);
-	}
+    // Use this for initialization 
+    void Start()
+    {
 
 
-
-	// Update is called once per frame 
-	void Update()
-	{
-		speedText.text = Mathf.Round((rb.velocity.magnitude* 3600/1000)*10)/10f + " km/h";
-	}
-	void FixedUpdate()
-	{	
-
-		if (canStartRacing) {
-			// always press vertical
-			float motorTorque = maxMotorTorque * 1;
-			float brakeTorque = maxBrakeTorque * Input.GetAxis ("Jump");
-			flController.ApplyThrottle (motorTorque);
-			frController.ApplyThrottle (motorTorque);
-			rlController.ApplyThrottle (motorTorque);
-			rrController.ApplyThrottle (motorTorque);
+        rb = GetComponent<Rigidbody>();
+        rb.centerOfMass =com;
+        if (speedText != null)
+        {
+            speedText.text = "0 km/h";
+        }
+        flController = frontLeft.GetComponent<WheelController>();
+        frController = frontRight.GetComponent<WheelController>();
+        rlController = rearLeft.GetComponent<WheelController>();
+        rrController = rearRight.GetComponent<WheelController>();
+        
+    }
 
 
-			flController.ApplyBrake (brakeTorque);
-			frController.ApplyBrake (brakeTorque);
-			rlController.ApplyBrake (brakeTorque);
-			rrController.ApplyBrake (brakeTorque);
+
+    // Update is called once per frame 
+    void Update()
+    {
+        if (transform.rotation.eulerAngles.x > 180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 Mathf.Clamp(transform.rotation.eulerAngles.x, 300, 360),
+                 transform.rotation.eulerAngles.y,
+                 transform.rotation.eulerAngles.z
+                 );
+        }
+        else if (transform.rotation.eulerAngles.x <180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 Mathf.Clamp(transform.rotation.eulerAngles.x, 0, 60),
+                 transform.rotation.eulerAngles.y,
+                 transform.rotation.eulerAngles.z
+                 );
+        }
+
+        if (transform.rotation.eulerAngles.z > 180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 transform.rotation.eulerAngles.x,
+                 transform.rotation.eulerAngles.y,
+                 Mathf.Clamp(transform.rotation.eulerAngles.z, 300, 360)
+                 );
+        }
+        else if (transform.rotation.eulerAngles.z < 180)
+        {
+            transform.rotation = Quaternion.Euler(
+                 transform.rotation.eulerAngles.x,
+                 transform.rotation.eulerAngles.y,
+                 Mathf.Clamp(transform.rotation.eulerAngles.z, 0, 60)
+                 );
+        }
+
+        if (speedText != null)
+        {
+            speedText.text = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f + " km/h";
+        }
+    }
+    void FixedUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.N) && isN2OReady && !isN2OEmitting)
+        {
+            isN2OReady = false;
+            isN2OEmitting = true;
+            foreach (ParticleSystem N2O in N2OParticles)
+            {
+                N2O.Play();
+            }
+            N2OTimer = Time.time;
+        }
+        if (isN2OEmitting)
+        {
+            if (Time.time - N2OTimer < N2OTime)
+            {
+                rb.AddForce(transform.forward * N2OPower, ForceMode.Acceleration);
+            }
+            else
+            {
+                isN2OReady = true;
+                isN2OEmitting = false;
+                foreach (ParticleSystem N2O in N2OParticles)
+                {
+                    N2O.Stop();
+                }
+                N2OTimer = 0;
+
+            }
+        }
+        float motorTorque = maxMotorTorque;// * Input.GetAxis("Vertical");
+        float brakeTorque = maxBrakeTorque * Input.GetAxis("Jump") ;
+        flController.ApplyThrottle(motorTorque);
+        frController.ApplyThrottle(motorTorque);
+        rlController.ApplyThrottle(motorTorque);
+        rrController.ApplyThrottle(motorTorque);
+        
+        
+        flController.ApplyBrake(brakeTorque);
+        frController.ApplyBrake(brakeTorque);
+        rlController.ApplyBrake(brakeTorque);
+        rrController.ApplyBrake(brakeTorque);
 
 
-			float steerAngle = steerRatio * Input.GetAxis ("Horizontal");
-			// Input.acceleration.x;//
+        float steerAngle = steerRatio *Input.GetAxis("Horizontal");// Input.acceleration.x;//
 
-//			float steerAngle = steerRatio * Input.acceleration.x;
+        flController.ApplySteer(steerAngle);
+        frController.ApplySteer(steerAngle);
 
-			flController.ApplySteer (steerAngle);
-			frController.ApplySteer (steerAngle);
+        if (rb.velocity.magnitude > topSpeed)
+        {
+            float slowDownRatio = rb.velocity.magnitude / topSpeed;
+            rb.velocity /= slowDownRatio;
+        }
+    }
 
-			if (rb.velocity.magnitude > topSpeed) {
-				float slowDownRatio = rb.velocity.magnitude / topSpeed;
-				rb.velocity /= slowDownRatio;
-			}
-		} 
+    public void speedDebuff(float debuffRatio)
+    {
+        topSpeed /= debuffRatio;
+    }
 
-		if (!canStartRacing && isGameOver) {
+    public void removeDebuff(float debuffRatio)
+    {
+        topSpeed *= debuffRatio;
+    }
 
-			float brakeTorque = maxBrakeTorque * 0.3f;
-			flController.ApplyBrake (brakeTorque);
-			frController.ApplyBrake (brakeTorque);
-			rlController.ApplyBrake (brakeTorque);
-			rrController.ApplyBrake (brakeTorque);
-		
-		}
-	}
-
-	public void speedDebuff(float debuffRatio)
-	{
-		topSpeed /= debuffRatio;
-	}
-
-	public void removeDebuff(float debuffRatio)
-	{
-		topSpeed *= debuffRatio;
-	}
-
-	public void setStartRacing() {
-		canStartRacing = true;
-	}
-
-	public void setGameOver() {
-		canStartRacing = false;
-		isGameOver = true;
-	}
-
-
+    public void ApplyBrake()
+    {
+        flController.ApplyBrake(maxBrakeTorque);
+        frController.ApplyBrake(maxBrakeTorque);
+        rlController.ApplyBrake(maxBrakeTorque);
+        rrController.ApplyBrake(maxBrakeTorque);
+    }
+    
 }
