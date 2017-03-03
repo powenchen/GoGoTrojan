@@ -5,6 +5,6 @@ using UnityEngine;
 public class LoadSceneOnClick : MonoBehaviour {
 
 	public void LoadByIndex() {
-		SceneManager.LoadScene ("CharacterPickUp");
+		SceneManager.LoadScene ("Story");
 	}
 }

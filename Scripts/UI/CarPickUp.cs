@@ -21,16 +21,15 @@ public class CarPickUp : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
 
 	public void Confirm() {
-		SceneManager.LoadScene("Race");
+		if(MapPickUp.routePicked == 1) { SceneManager.LoadScene("race"); }
+		else if(MapPickUp.routePicked == 2) { SceneManager.LoadScene("MainMenu"); }
+
 	}
 
 	public void GoBack() {
-		Debug.Log ("in CarPickUp; you picked up character: " + CharacterPickUp.whichCharacter);
-		Debug.Log ("in CarPickUp: you picked up car: " + whichCar);
 		SceneManager.LoadScene("CharacterPickUp");
 	}
 
