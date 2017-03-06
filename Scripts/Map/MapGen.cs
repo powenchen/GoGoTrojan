@@ -51,6 +51,11 @@ public class MapGen : MonoBehaviour
 
                 if (i == 0)//player
                 {
+                    mainCamera.transform.position = car.transform.position + new Vector3(0, 2, -6);
+                    backGroundCamera.transform.position = car.transform.position + new Vector3(0, 2, -6);
+                    mainCamera.transform.rotation = car.transform.rotation;
+                    backGroundCamera.transform.rotation = car.transform.rotation;
+
                     mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
                     backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
                     setSkyBox(car, skyBoxDebugInit);
