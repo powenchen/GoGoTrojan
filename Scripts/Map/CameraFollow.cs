@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour {
 
-    public Transform followee;
+    public Transform target;
     
 	// Use this for initialization
 	void Start () {
         transform.position = 
             new Vector3 (
-            followee.position.x,
+            target.position.x,
             transform.position.y,
-            followee.position.z
+            target.position.z
             );
 
     }
@@ -22,10 +22,15 @@ public class CameraFollow : MonoBehaviour {
     {
         transform.position =
             new Vector3(
-            followee.position.x,
+            target.position.x,
             transform.position.y,
-            followee.position.z
+            target.position.z
             );
 
+    }
+
+    public void setTarget(Transform t)
+    {
+        target = t;
     }
 }

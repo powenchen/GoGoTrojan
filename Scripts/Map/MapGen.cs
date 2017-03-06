@@ -123,7 +123,7 @@ public class MapGen : MonoBehaviour
             
 
             DestroyImmediate(car.gameObject.GetComponent<AIScript>()); // delete player car's ai script
-            miniMap.GetComponent<MiniMapManager>().setCamFolowee(car.transform);
+            miniMap.GetComponent<MiniMapManager>().setCamFolowee(mark.transform);
         }
         else
         {
