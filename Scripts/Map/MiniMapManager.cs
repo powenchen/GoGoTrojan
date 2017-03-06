@@ -17,7 +17,7 @@ public class MiniMapManager : MonoBehaviour {
 		
 	}
 
-    public void setCamFolowee(Transform player)
+    public void setCamTarget(Transform player)
     {
         minimapCam.gameObject.GetComponent<CameraFollow>().setTarget(player);
     }
