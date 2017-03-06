@@ -18,6 +18,7 @@ public class MapGen : MonoBehaviour
     private int skyBoxIdx;
 
     private Car[] racers = new Car[maxRacerNum];
+    private int racersLength = 0;
 
     // for debug
     public int[] carinitDebug;
@@ -34,6 +35,7 @@ public class MapGen : MonoBehaviour
     void OnDrawGizmos () {
         if (debugFlag)
         {
+            racersLength = 0;
             skyBoxIdx = skyBoxInitDebug;
             setCourse(courseinitDebug);
             for (int i = 0; i < carinitDebug.Length; ++i)
@@ -61,11 +63,14 @@ public class MapGen : MonoBehaviour
             {
                 if (car.gameObject.GetComponent<TimeStopSkill>() != null)
                 {
-                    car.gameObject.GetComponent<TimeStopSkill>().enemies = new GameObject[racers.Length - 1];
+                    if (racersLength >= 1)
+                    {
+                        car.gameObject.GetComponent<TimeStopSkill>().enemies = new GameObject[racersLength - 1];
+                    }
                     int idx = 0;
                     for (int i = 0; i < racers.Length; ++i)
                     {
-                        if (!racers[i].Equals(car))
+                        if (racers[i]!=null && !racers[i].Equals(car))
                         {
                             car.gameObject.GetComponent<TimeStopSkill>().enemies[idx++] = racers[i].gameObject;
                         }
@@ -101,7 +106,7 @@ public class MapGen : MonoBehaviour
         miniMapMark mark = Instantiate(miniMarkList[charID], position, rotation).GetComponent<miniMapMark>();
         mark.transform.parent = miniMap.transform;
         racers[racerNum] = car;
-
+        racersLength++;
         mark.transform.localPosition = new Vector3(0, 0, 0);
         mark.MyCar = car.transform;
 
@@ -115,16 +120,7 @@ public class MapGen : MonoBehaviour
         if (isPlayer)//player
         {
             setCamera(car, skyBoxIdx);
-            if (isNight(skyBoxIdx))
-            {
-                dayLight.enabled = false;
-                nightLight.enabled = true;
-            }
-            else
-            {
-                dayLight.enabled = true;
-                nightLight.enabled = true;
-            }
+            
 
             DestroyImmediate(car.gameObject.GetComponent<AIScript>()); // delete player car's ai script
             miniMap.GetComponent<MiniMapManager>().setCamFolowee(car.transform);
@@ -153,13 +149,20 @@ public class MapGen : MonoBehaviour
 
         mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
         backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
-
-        foreach (Camera cam in car.gameObject.GetComponentsInChildren<Camera>())
+        if (backGroundCamera.GetComponent<Skybox>() != null)
         {
-            if (cam.GetComponent<Skybox>() != null)
-            {
-                cam.GetComponent<Skybox>().material = skyBoxes[skyBoxID];
-            }
+            backGroundCamera.GetComponent<Skybox>().material = skyBoxes[skyBoxID];
+        }
+
+        if (isNight(skyBoxID))
+        {
+            dayLight.enabled = false;
+            nightLight.enabled = true;
+        }
+        else
+        {
+            dayLight.enabled = true;
+            nightLight.enabled = true;
         }
     }
 
@@ -167,8 +170,11 @@ public class MapGen : MonoBehaviour
     {
         if (skyBoxes[skyBoxID].name.StartsWith("Sunny"))
         {
+            //Debug.Log("It's  not night for skybox(" + skyBoxes[skyBoxID].name + ")");
             return false;
         }
+
+        //Debug.Log("It's night for skybox(" + skyBoxes[skyBoxID].name + ")");
         return true;
     }
 }
