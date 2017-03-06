@@ -17,91 +17,33 @@ public class MapGen : MonoBehaviour
     public Light dayLight, nightLight;
     private int skyBoxIdx;
 
-    private Car[] racers;
+    private Car[] racers = new Car[maxRacerNum];
 
+    // for debug
     public int[] carinitDebug;
     public int courseinitDebug;
-    public int skyBoxDebugInit;
-
+    public int skyBoxInitDebug;
+    private float maxHPDebug = 100;
+    private float maxMPDebug = 100;
+    private float maxATKDebug = 100;
+    
     public bool debugFlag = false;
+
+
     // Use this for initialization; used for debug
     void OnDrawGizmos () {
         if (debugFlag)
         {
-            Car[] racers = new Car[carinitDebug.Length];
+            skyBoxIdx = skyBoxInitDebug;
+            setCourse(courseinitDebug);
             for (int i = 0; i < carinitDebug.Length; ++i)
             {
-                Vector3 position = courseList[courseinitDebug].getStartPositions()[i+1];
-                Quaternion rotation = Quaternion.Euler(0, courseList[courseinitDebug].getStartRotation().eulerAngles.y,0);
-                //Debug.Log("init rotation = " + courseList[courseinitDebug].getStartRotation().eulerAngles.ToString());
-                Car car = Instantiate(characterList[carinitDebug[i]], position, rotation).GetComponent<Car>();
-                miniMapMark mark = Instantiate(miniMarkList[carinitDebug[i]], position, rotation).GetComponent<miniMapMark>();
-                racers[i] = car;
-                mark.transform.parent = miniMap.transform;
-                mark.transform.localPosition = new Vector3(0, 0, 0);
-                mark.MyCar = car.transform;
-
-                if (car.GetComponent<TimeStopSkill>() != null)
-                {
-                    car.GetComponent<TimeStopSkill>().backGroundCamera = backGroundCamera;
-
-                    car.GetComponent<TimeStopSkill>().mainCamera = mainCamera;
-
-                }
-
-                if (i == 0)//player
-                {
-                    mainCamera.transform.position = car.transform.position + new Vector3(0, 2, -6);
-                    backGroundCamera.transform.position = car.transform.position + new Vector3(0, 2, -6);
-                    mainCamera.transform.rotation = car.transform.rotation;
-                    backGroundCamera.transform.rotation = car.transform.rotation;
-
-                    mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
-                    backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
-                    setSkyBox(car, skyBoxDebugInit);
-                    if (isNight(skyBoxDebugInit))
-                    {
-                        dayLight.enabled = false;
-                        nightLight.enabled = true;
-                    }
-                    else
-                    {
-                        dayLight.enabled = true;
-                        nightLight.enabled = true;
-                    }
-
-                    DestroyImmediate(car.gameObject.GetComponent<AIScript>());
-                    miniMap.GetComponent<MiniMapManager>().setCamFolowee(car.transform);
-                }
-                else
-                {
-
-                    DestroyImmediate(car.gameObject.GetComponent<PlayerController>());
-                    foreach (Camera cam in car.gameObject.GetComponentsInChildren<Camera>())
-                    {
-                        cam.gameObject.SetActive(false);
-                    }
-                    car.gameObject.GetComponent<AIScript>().path = courseList[courseinitDebug].getPath();
-                }
-
+                // set car(i==0) as player
+                initCharacter(courseinitDebug, carinitDebug[i], maxHPDebug, maxMPDebug, maxATKDebug, i, (i == 0));
             }
+            //there are carinitDebug.Length cars; init them in time stop skill users' enemy lists 
+            initTimeStopskillUsers();
 
-            //there are carinitDebug.Length cars 
-            foreach (Car car in racers)
-            {
-                if (car.gameObject.GetComponent<TimeStopSkill>() != null)
-                {
-                    car.gameObject.GetComponent<TimeStopSkill>().enemies = new GameObject[carinitDebug.Length - 1];
-                    int idx = 0;
-                    for (int i = 0; i < carinitDebug.Length; ++i)
-                    {
-                        if (!racers[i].Equals(car))
-                        {
-                            car.gameObject.GetComponent<TimeStopSkill>().enemies[idx++] = racers[i].gameObject;
-                        }
-                    }
-                }
-            }
             debugFlag = false;
         }
     }
@@ -111,18 +53,30 @@ public class MapGen : MonoBehaviour
 		
 	}
 
-    public void setRaceCourse(int courseID)
+    public void initTimeStopskillUsers()
     {
-        foreach (Car racer in racers)
+        foreach (Car car in racers)
         {
-            if (racer != null && racer.gameObject.GetComponent<AIScript>() !=null)
+            if (car != null)
             {
-                racer.gameObject.GetComponent<AIScript>().path = courseList[courseID].gameObject.GetComponent<PathManager>();
+                if (car.gameObject.GetComponent<TimeStopSkill>() != null)
+                {
+                    car.gameObject.GetComponent<TimeStopSkill>().enemies = new GameObject[racers.Length - 1];
+                    int idx = 0;
+                    for (int i = 0; i < racers.Length; ++i)
+                    {
+                        if (!racers[i].Equals(car))
+                        {
+                            car.gameObject.GetComponent<TimeStopSkill>().enemies[idx++] = racers[i].gameObject;
+                        }
+                    }
+                }
             }
         }
-
-        skyBoxIdx = courseID;
-
+    }
+    public void setCourse(int courseID)
+    {
+        
         for (int i = 0; i < courseList.Length; ++i)
         {
             if (i == courseID)
@@ -137,58 +91,70 @@ public class MapGen : MonoBehaviour
         }
     }
 
-    public Car initCharacter(int charID, int skillID, float maxHP, float maxMP, float attackPower)
+    public void initCharacter(int courseID ,int charID, float maxHP, float maxMP, float attackPower, int racerNum, bool isPlayer = false)
     {
-        Car character = Instantiate(characterList[charID]).GetComponent<Car>();
-        //TODO: set character.position to some point relate to course
-        //TODO: instantiate minimap mark
-        //TODO: set player mark index in minimap manager and set followee
+        Vector3 position = courseList[courseID].getStartPositions()[racerNum + 1];
+        Quaternion rotation = Quaternion.Euler(0, courseList[courseID].getStartRotation().eulerAngles.y, 0);
+        PathManager path = courseList[courseID].getPath();
 
-        setSkyBox(character, skyBoxIdx);
-        if (isNight(skyBoxIdx))
+        Car car = Instantiate(characterList[charID], position, rotation).GetComponent<Car>();
+        miniMapMark mark = Instantiate(miniMarkList[charID], position, rotation).GetComponent<miniMapMark>();
+        mark.transform.parent = miniMap.transform;
+        racers[racerNum] = car;
+
+        mark.transform.localPosition = new Vector3(0, 0, 0);
+        mark.MyCar = car.transform;
+
+        if (car.GetComponent<TimeStopSkill>() != null)
         {
-            dayLight.enabled = false;
-            nightLight.enabled = true;
+            car.GetComponent<TimeStopSkill>().backGroundCamera = backGroundCamera;
+            car.GetComponent<TimeStopSkill>().mainCamera = mainCamera;
+
+        }
+
+        if (isPlayer)//player
+        {
+            setCamera(car, skyBoxIdx);
+            if (isNight(skyBoxIdx))
+            {
+                dayLight.enabled = false;
+                nightLight.enabled = true;
+            }
+            else
+            {
+                dayLight.enabled = true;
+                nightLight.enabled = true;
+            }
+
+            DestroyImmediate(car.gameObject.GetComponent<AIScript>()); // delete player car's ai script
+            miniMap.GetComponent<MiniMapManager>().setCamFolowee(car.transform);
         }
         else
         {
-            dayLight.enabled = true;
-            nightLight.enabled = false;
-        }
-        insertIntoRacersList(character);
-        return character;
-    }
 
-    public Car initEnemy(int charID, float maxHP, float maxMP, float attackPower)
-    {
-
-        Car character = Instantiate(characterList[charID]).GetComponent<Car>();
-        //TODO: set character.position to some point relate to course
-        //TODO: destroy prefab's camera
-        //TODO: instantiate minimap mark
-
-
-        insertIntoRacersList(character);
-        return character;
-    }
-
-    private void insertIntoRacersList(Car newRacer)
-    {
-        for (int i = 0; i < racers.Length; ++i)
-        {
-            if (racers[i] == null)
+            DestroyImmediate(car.gameObject.GetComponent<PlayerController>());// delete ai car's player script
+            foreach (Camera cam in car.gameObject.GetComponentsInChildren<Camera>())
             {
-                racers[i] = newRacer;
-                return;
+                // disable ai car's camera
+                cam.gameObject.SetActive(false);
             }
+            car.gameObject.GetComponent<AIScript>().path = path;
         }
-
     }
 
 
-    private void setSkyBox(Car character, int skyBoxID)
+
+    private void setCamera(Car car, int skyBoxID)
     {
-        foreach (Camera cam in character.gameObject.GetComponentsInChildren<Camera>())
+        mainCamera.transform.position = car.transform.position + new Vector3(0, 2, -6);
+        backGroundCamera.transform.position = car.transform.position + new Vector3(0, 2, -6);
+        mainCamera.transform.rotation = car.transform.rotation;
+        backGroundCamera.transform.rotation = car.transform.rotation;
+
+        mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
+        backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
+
+        foreach (Camera cam in car.gameObject.GetComponentsInChildren<Camera>())
         {
             if (cam.GetComponent<Skybox>() != null)
             {
