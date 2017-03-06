@@ -7,13 +7,13 @@ public class BouncingWall : MonoBehaviour
    // public ParticleSystem sparkOnContact;
     private Rigidbody rb;
     public float maxTorque = 200;
-    private mover m;
+    private Car m;
     // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = 25;
-        m = GetComponent<mover>();
+        m = GetComponent<Car>();
     }
 
     // Update is called once per frame
@@ -49,7 +49,7 @@ public class BouncingWall : MonoBehaviour
                 Vector3 localContactPoint = transform.InverseTransformPoint(contact.point);
                 Vector3 localContactNormal = transform.InverseTransformDirection(contact.normal);
                 Vector3 torque = -Mathf.Sign(localContactPoint.x) * transform.up * maxTorque * Mathf.Abs(localContactNormal.z);
-                Debug.Log("torque = " + torque.ToString());
+               // Debug.Log("torque = " + torque.ToString());
                 rb.AddTorque(torque, ForceMode.Acceleration);
 
                 m.ApplyBrake(1);

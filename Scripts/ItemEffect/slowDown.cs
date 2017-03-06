@@ -19,7 +19,7 @@ public class slowDown : MonoBehaviour {
        // Debug.Log("triggered!!! tag = "+other.tag);
         if (other.CompareTag("Enemy") || other.CompareTag("Player"))
         {
-            other.transform.root.GetComponent<mover>().speedDebuff(slowDownRatio);
+            other.transform.root.GetComponent<Car>().speedDebuff(slowDownRatio);
         }
     }
 
@@ -27,7 +27,7 @@ public class slowDown : MonoBehaviour {
     {
         if (other.CompareTag("Enemy")||other.CompareTag("Player"))
         {
-            other.transform.root.GetComponent<mover>().removeDebuff(slowDownRatio);
+            other.transform.root.GetComponent<Car>().removeDebuff(slowDownRatio);
         }
     }
 }

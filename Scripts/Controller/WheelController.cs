@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class WheelController : MonoBehaviour
 {
+    public float rpm;
     private WheelCollider wheel;
     public Vector3 wheelAxis = new Vector3(1, 0, 0);
+    public AudioClip accelAudio, brakeAudio;
+    private AudioSource accelSound, brakeSound;
 
 	public float speedThreshold = 1;
 	public int stepsBelowThreshold = 15, stepsAboveThreshold = 12;
@@ -13,6 +16,8 @@ public class WheelController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        accelSound = SetUpEngineAudioSource(accelAudio);
+        brakeSound = SetUpEngineAudioSource(brakeAudio);
 		WheelInit ();
     }
 
@@ -27,11 +32,15 @@ public class WheelController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(wheelAxis * Time.deltaTime * wheel.rpm / 60f * 360f);
+        rpm = wheel.rpm;
+        transform.Rotate(wheelAxis * (Time.deltaTime * wheel.rpm / 60f * 360f));
     }
 
     private void FixedUpdate()
     {
+        accelSound.volume = Mathf.Clamp(wheel.rpm / 10000, 0, 0.5f);
+        brakeSound.volume = Mathf.Clamp(wheel.brakeTorque / 10000, 0, 0.5f);
+
     }
 
    /* public void SlowDown(float debuff)
@@ -73,10 +82,26 @@ public class WheelController : MonoBehaviour
     {
 		if (wheel == null) {
 		
-			Debug.Log ("hahaha "+name);
+			Debug.Log ("wheel is null "+name);
 		}
 		else
         wheel.ConfigureVehicleSubsteps(speedThreshold, stepsBelowThreshold, stepsAboveThreshold);
+    }
+
+    private AudioSource SetUpEngineAudioSource(AudioClip clip)
+    {
+        // create the new audio source component on the game object and set up its properties
+        AudioSource source = gameObject.AddComponent<AudioSource>();
+        source.clip = clip;
+        source.volume = 0;
+        source.loop = true;
+
+        // start the clip from a random point
+        source.time = Random.Range(0f, clip.length);
+        source.Play();
+        //source.minDistance = 5;
+        //source.dopplerLevel = 0;
+        return source;
     }
 
 

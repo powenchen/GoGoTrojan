@@ -4,36 +4,38 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-    private mover carMover;
+    private Car car;
 
 	// Use this for initialization
 	void Start () {
-        carMover = GetComponent<mover>();
+        car = GetComponent<Car>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
 
     private void FixedUpdate()
     {
+        
+
         if (Input.GetKeyDown(KeyCode.N))
         {
-            carMover.ApplyN2O();
+            car.useSkill();
         }
         
         float motorTorqueFactor = 1;// * Input.GetAxis("Vertical");
         float brakeTorqueFactor = Input.GetAxis("Jump");
 
-        carMover.ApplyPedal(motorTorqueFactor, brakeTorqueFactor);
+        car.ApplyPedal(motorTorqueFactor, brakeTorqueFactor);
 
         
 
 
         float steerFactor = Input.GetAxis("Horizontal");// Input.acceleration.x;
 
-        carMover.ApplySteer(steerFactor);
+        car.ApplySteer(steerFactor);
 
     }
+
 }

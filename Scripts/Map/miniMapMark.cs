@@ -11,6 +11,13 @@ public class miniMapMark : MonoBehaviour {
     {
         transform.position =
             new Vector3(MyCar.position.x, transform.position.y, MyCar.position.z);
+        transform.rotation = Quaternion.Euler(
+            new Vector3(
+                transform.rotation.eulerAngles.x,
+                MyCar.rotation.eulerAngles.y,
+                transform.rotation.eulerAngles.z
+                )
+        );
     }
 
     void Start () {
@@ -22,5 +29,12 @@ public class miniMapMark : MonoBehaviour {
     {
         transform.position =
             new Vector3(MyCar.position.x, transform.position.y, MyCar.position.z);
+        transform.rotation = Quaternion.Euler(
+            new Vector3(
+                transform.rotation.eulerAngles.x,
+                MyCar.rotation.eulerAngles.y,
+                transform.rotation.eulerAngles.z
+                )
+        );
     }
 }

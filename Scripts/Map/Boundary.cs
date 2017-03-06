@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Boundary : MonoBehaviour {
 
-    public float xMin = 5, xMax = 1495;
-    public float zMin = 5, zMax = 1495;
+    public float xMin = -1495, xMax = 1495;
+    public float zMin = -1495, zMax = 1495;
     // Use this for initialization
     void Start () {
 		

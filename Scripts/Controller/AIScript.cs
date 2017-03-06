@@ -6,36 +6,38 @@ using UnityEngine.UI;
 // test modification
 
 public class AIScript : MonoBehaviour {
-    public float distThreshold = 3.0f;
-    
-    public GameObject path;
+    public bool skillDebugFlag = false;
+    private float distThreshold = 10;
+
+    private int lookAhead = 3;
+    public PathManager path;
     private Transform[] pathPoints;
-    private int pathPointIdx = 1; // start from 1 since idx = 0 is parent component 
+    public int pathPointIdx = 1; // start from 1 since idx = 0 is parent component 
     
     private Rigidbody rb;
 
-    public float sensorLength = 5;
-    public float sideSensorLength = 3;
-    public float frontSensorStartPoint = 3;
-    public float frontSensorMargin = 1;
-    public float frontSensorAngle = 15;
-    public float avoidSpeed = 0.6f;
+    private float sensorLength = 5;
+    private float sideSensorLength = 3;
+    private float frontSensorStartPoint = 3;
+    private float frontSensorMargin = 1;
+    private float frontSensorAngle = 15;
+    private float avoidSpeed = 0.6f;
     private int flag = 0;
     private bool reversing = false;
-    public float reverseTimer = 0;
-    public float waitToReverse = 2;
-    public float reverseFor = 1.5f;
-    public float stuckThreshlod = 10 * 1000 / 3600;//(10 km/h)
-
-    private mover carMover;
+    private float reverseTimer = 0;
+    private float waitToReverse = 2;
+    private float reverseFor = 1.5f;
+    private float stuckThreshlod = 10 * 1000 / 3600;//(10 km/h)
+    private bool pauseFlag = false;
+    private Car car;
 
     // Use this for initialization
     void Start () {
-        carMover = GetComponent<mover>();
+        car = GetComponent<Car>();
         rb = GetComponent<Rigidbody>();
         if (path!=null)
         {
-            pathPoints = path.GetComponentsInChildren<Transform>();
+            pathPoints = path.gameObject.GetComponentsInChildren<Transform>();
         }
         
 
@@ -46,16 +48,51 @@ public class AIScript : MonoBehaviour {
 
     }
 
+    public void PauseAI()
+    {
+        pauseFlag = true;
+    }
+
+    public void resumeAI()
+    {
+        pauseFlag = false;
+    }
+
     private void FixedUpdate()
     {
+        if (pauseFlag)
+        {
+            return;
+        }
+        if(skillDebugFlag)
+            car.useSkill();
+        //Debug.Log("speed = " + rb.velocity.magnitude);
 
         //Debug.Log("steer = "+frontLeft.GetComponent<WheelCollider>().steerAngle + ", motor torque = "+ frontLeft.GetComponent<WheelCollider>().motorTorque);
 
         if (pathPointIdx >= pathPoints.Length)
         {
-            carMover.ApplyBrake(1);// full brake
+            car.stopRunning();
             return;
         }
+        float minDist = (pathPoints[pathPointIdx].position - transform.position).magnitude;
+        int bestI = pathPointIdx;
+        for (int i = pathPointIdx + 1; i < Mathf.Min(pathPointIdx+ lookAhead, pathPoints.Length) ; ++i)
+        {
+            float distI = (pathPoints[i].position - transform.position).magnitude;
+            if (distI < minDist)
+            {
+                bestI = i;
+                minDist = distI;
+            }
+
+        }
+        if(pathPointIdx!= bestI)
+        { 
+            pathPointIdx = bestI;
+            Debug.Log("AI skipped to point"+ bestI);
+        }
+
         Vector3 nextPoint = transform.InverseTransformPoint(new Vector3(
                                                             pathPoints[pathPointIdx].position.x,
                                                             transform.position.y,
@@ -70,24 +107,29 @@ public class AIScript : MonoBehaviour {
 
         if (nextPoint.magnitude < distThreshold)
         {
-            Debug.Log("AI passed point" + pathPointIdx + "[" + pathPoints[pathPointIdx].position.x + "," + pathPoints[pathPointIdx].position.y + "," + pathPoints[pathPointIdx].position.z + "]");
+            Debug.Log("AI passed point" + pathPointIdx + " " + pathPoints[pathPointIdx].position.ToString());
             ++pathPointIdx;
         }
 
-        float newSteerFactor =  (steerVector.x / steerVector.magnitude);
+        float newSteerFactor =  (steerVector.x / steerVector.magnitude); // -1< newSteerFactor <1
+        if (steerVector.magnitude == 0)
+            newSteerFactor = 0;
 
-        float newMotorTorqueFactor = 1;// * (1 - Mathf.Abs(steerVector.x / steerVector.magnitude));
+        float newMotorTorqueFactor = 1 - 0.5f*Mathf.Abs(newSteerFactor);
+        //Debug.Log("newMotorTorqueFactor = " + newMotorTorqueFactor);
 
         if (reversing)
         {
             newMotorTorqueFactor *= -1;
+
+            Debug.Log("reversing; newMotorTorqueFactor = " + newMotorTorqueFactor);
         }
 
         if (flag == 0)
         {
-            carMover.ApplySteer(newSteerFactor);
+            car.ApplySteer(newSteerFactor);
         }
-        carMover.ApplyThrottle(newMotorTorqueFactor);
+        car.ApplyThrottle(newMotorTorqueFactor);
 
 
        Sensor();
@@ -106,15 +148,18 @@ public class AIScript : MonoBehaviour {
         RaycastHit hit;
         
         //braking sensor
-        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) /*&& !hit.transform.CompareTag("Terrain")*/)
+        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
-            carMover.ApplyBrake(0.2f);
+            if (!reversing)
+            {
+                car.ApplyBrake(0.2f);
+            }
             Debug.DrawLine(pos, hit.point, Color.red);
         }
         else
         {
-            carMover.ApplyBrake(0);
+            car.ApplyBrake(0);
         }
         
 
@@ -122,13 +167,13 @@ public class AIScript : MonoBehaviour {
         pos = transform.position;
         pos += transform.forward * frontSensorStartPoint + transform.right*frontSensorMargin;
         Vector3 sensorAngle = Quaternion.AngleAxis(frontSensorAngle, transform.up) * transform.forward;
-        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) /*&& !hit.transform.CompareTag("Terrain")*/)
+        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity -= 1;
             Debug.DrawLine(pos, hit.point, Color.white);
         }
-        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) /*&& !hit.transform.CompareTag("Terrain")*/)
+        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity -= 0.5f;
@@ -141,13 +186,13 @@ public class AIScript : MonoBehaviour {
         pos += transform.forward * frontSensorStartPoint - transform.right * frontSensorMargin;
 
         sensorAngle = Quaternion.AngleAxis(-frontSensorAngle, transform.up) * transform.forward;
-        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) /*&& !hit.transform.CompareTag("Terrain")*/)
+        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity += 1;
             Debug.DrawLine(pos, hit.point, Color.white);
         }
-        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) /*&& !hit.transform.CompareTag("Terrain")*/)
+        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity += 0.5f;
@@ -155,7 +200,7 @@ public class AIScript : MonoBehaviour {
         }
 
         //right side sensor
-        if (Physics.Raycast(transform.position, transform.right, out hit, sideSensorLength) /*&& !hit.transform.CompareTag("Terrain")*/)
+        if (Physics.Raycast(transform.position, transform.right, out hit, sideSensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity -= 0.5f;
@@ -163,7 +208,7 @@ public class AIScript : MonoBehaviour {
         }
 
         //left side sensor
-        if (Physics.Raycast(transform.position, -transform.right, out hit, sideSensorLength) /*&& !hit.transform.CompareTag("Terrain")*/)
+        if (Physics.Raycast(transform.position, -transform.right, out hit, sideSensorLength) && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity += 0.5f;
@@ -206,7 +251,6 @@ public class AIScript : MonoBehaviour {
 
         if (reversing)
         {
-            Debug.Log("reversing");
             reverseTimer += Time.deltaTime;
             avoidSensitivity *= -1;
             if (reverseTimer >= reverseFor)
@@ -226,7 +270,7 @@ public class AIScript : MonoBehaviour {
     void AvoidSteer(float sensitivity)
     {
         float newSteerFactor = avoidSpeed * sensitivity;
-        carMover.ApplySteer(newSteerFactor);
+        car.ApplySteer(newSteerFactor);
     }
 
 
