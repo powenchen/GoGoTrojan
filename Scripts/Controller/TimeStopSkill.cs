@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimeStopSkill : Skill
 {
-    public Camera grayCamera, mainCamera;
+    public Camera backGroundCamera, mainCamera;
     private UnityStandardAssets.ImageEffects.ColorCorrectionRamp grayScaleScript;
 
     private float StopTime = 1;
@@ -18,7 +18,7 @@ public class TimeStopSkill : Skill
     // Use this for initialization
     void Start () {
         mainCamera.enabled = false;
-        grayScaleScript = grayCamera.GetComponent< UnityStandardAssets.ImageEffects.ColorCorrectionRamp> ();
+        grayScaleScript = backGroundCamera.GetComponent< UnityStandardAssets.ImageEffects.ColorCorrectionRamp> ();
         grayScaleScript.enabled = false;
 	}
 	

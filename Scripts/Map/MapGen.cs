@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapGen : MonoBehaviour {
+public class MapGen : MonoBehaviour
+{
+    public Camera mainCamera;
+    public Camera backGroundCamera;
     public const int stageNum = 2;
     public const int maxRacerNum = 4;
     public GameObject miniMap;
@@ -37,8 +40,19 @@ public class MapGen : MonoBehaviour {
                 mark.transform.parent = miniMap.transform;
                 mark.transform.localPosition = new Vector3(0, 0, 0);
                 mark.MyCar = car.transform;
+
+                if (car.GetComponent<TimeStopSkill>() != null)
+                {
+                    car.GetComponent<TimeStopSkill>().backGroundCamera = backGroundCamera;
+
+                    car.GetComponent<TimeStopSkill>().mainCamera = mainCamera;
+
+                }
+
                 if (i == 0)//player
                 {
+                    mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
+                    backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
                     setSkyBox(car, skyBoxDebugInit);
                     if (isNight(skyBoxDebugInit))
                     {
