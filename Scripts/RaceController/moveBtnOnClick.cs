@@ -7,28 +7,44 @@ public class moveBtnOnClick : MonoBehaviour {
 
 	public Button MoveBtn;
 	public Text MoveBtnText;
+    public Car car;
 
 
 	// Use this for initialization
 	void Start () {
 		if (MoveBtnText != null) {
-			MoveBtnText.text = "";
+            MoveBtnText.text = "";
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+        if (car.getMP() == car.getMaxMP())
+        {
+            if (car.GetComponent<N2OSkill>() != null)
+            {
+                MoveBtnText.text = "NITRO";
+            }
+            if (car.GetComponent<TimeStopSkill>() != null)
+            {
+                MoveBtnText.text = "TIME";
+            }
+        }
+        else {
+
+            MoveBtnText.text = "";
+        }
 	}
 
 	public void moveButtonOnClick () {
-
-		MoveBtn.interactable = false;
+        
 		MoveBtnText.text = "";
-		GameObject.Find ("RegularC").SendMessage("CDUsed");
-		//		PlayerCoolDownValue cdv = GameObject.FindGameObjectWithTag ("MyCar").GetComponent<PlayerCoolDownValue> ();
-		//		cdv.CDUsed ();
-		GameObject.Find ("RegularC").SendMessage("NitroStart");
+        car.useSkill();
 
 	}
+
+    public void setPlayerCar(Car c)
+    {
+        car = c;
+    }
 }

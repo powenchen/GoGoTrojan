@@ -4,10 +4,13 @@ using UnityEngine.UI;
 
 public class Car : MonoBehaviour
 {
+    public static bool waitForStartFlag = true;
+    public static bool gameIsOver = false;
+    public bool startRacingFlag = false;
     public const float FREEZE_DRAG = 100000;
     private Vector3 com = new Vector3(0,0,0);
-    private float maxMotorTorque = 10000;
-    private float maxBrakeTorque = 20000;
+    private float maxMotorTorque = 2500;
+    private float maxBrakeTorque = 30000;
     private float maxSteerAngle = 15;
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
     public Text speedText;
@@ -17,7 +20,7 @@ public class Car : MonoBehaviour
     
     private Rigidbody rb;
     private WheelController flController, frController, rlController, rrController;
-    
+    public ParticleSystem AIExplosionOnDead;
 
     private float maxTiltAngle = 20;
 
@@ -26,14 +29,19 @@ public class Car : MonoBehaviour
 
     private Skill mySkill;
 
-    private float myHP;
-    private float myMaxHP;
+    public float myHP = 100;
+    private float myMaxHP = 100;
     private float myMaxMP=100;
-    private float myMP=100;
+    public float myMP=100;
     private float myAttackPower;
-    
+    public float mySkillCD;
+
 
     private bool stopFlag = false;
+
+    private float speedDebuffTime = 2;
+    private bool isSpeedDebuffing = false;
+    private float speedDebuffTimer = 0;
 
     // Use this for initialization 
     void Start()
@@ -58,6 +66,29 @@ public class Car : MonoBehaviour
     // Update is called once per frame 
     void Update()
     {
+        if(GetComponent<AIScript>() !=null)
+        {
+            // destroy ai car
+            if (getHP() == 0)
+            {
+                Instantiate(AIExplosionOnDead, transform.position, transform.rotation);
+                Destroy(gameObject);
+            }
+
+        }
+        if (!stopFlag)
+        {
+           increaseMP(getMaxMP()*Time.deltaTime * (10 / getSkillCD()));
+        }
+        if (isSpeedDebuffing)
+        {
+            speedDebuffTimer += Time.deltaTime;
+            if (speedDebuffTimer >= speedDebuffTime)
+            {
+                removeSpeedDebuff();
+            }
+
+        }
         carVelocity = GetComponent<Rigidbody>().velocity.magnitude;
         if (transform.rotation.eulerAngles.x > 180)
         {
@@ -98,8 +129,23 @@ public class Car : MonoBehaviour
             speedText.text = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f + " km/h";
         }
     }
+
     void FixedUpdate()
     {
+        if (gameIsOver)
+        {
+            stopRunning();
+            return;
+        }
+        if (waitForStartFlag)
+        {
+            stopRunning();
+        }
+        if(!waitForStartFlag && !startRacingFlag)
+        {
+            startRunning();
+            startRacingFlag = true;
+        }
         if (stopFlag)
         {
             return;
@@ -111,16 +157,7 @@ public class Car : MonoBehaviour
             rb.velocity /= slowDownRatio;
         }
     }
-
-    public void speedDebuff(float debuffRatio)
-    {
-        topSpeed /= debuffRatio;
-    }
-
-    public void removeDebuff(float debuffRatio)
-    {
-        topSpeed *= debuffRatio;
-    }
+    
 
     public void ApplyThrottle(float throttleFactor)
     {
@@ -144,8 +181,11 @@ public class Car : MonoBehaviour
 
     public void useSkill()
     {
-        mySkill.activateSkill();
-        myMP = 0;
+        if (myMP == myMaxMP)
+        {
+            mySkill.activateSkill();
+            myMP = 0;
+        }
     }
 
    
@@ -317,7 +357,7 @@ public class Car : MonoBehaviour
     {
         myMP = Mathf.Clamp(myMP + point, 0, myMaxMP);
     }
-    public void AttackInitialize(float point)
+    public void attackInitialize(float point)
     {
         myAttackPower = point;
     }
@@ -332,12 +372,51 @@ public class Car : MonoBehaviour
         myAttackPower = Mathf.Max(myAttackPower - point, 0);
     }
 
-    public void increaseAttackPower(float point)
+    public void skillCD(float point)
     {
-        myAttackPower += point; 
+        myAttackPower = point;
     }
 
-  
 
+    public void skillCDInitialize(float point)
+    {
+        mySkillCD = point;
+    }
+
+    public float getSkillCD()
+    {
+        return mySkillCD;
+    }
+
+    public void decreaseSkillCD(float point)
+    {
+        mySkillCD = Mathf.Max(mySkillCD - point, 0);
+    }
+
+    public void increaseSkillCD(float point)
+    {
+        mySkillCD += point; 
+    }
+
+
+    public void speedDebuff()
+    {
+        topSpeed /= 2;
+        isSpeedDebuffing = true;
+        speedDebuffTimer = 0;
+    }
+
+    public void removeSpeedDebuff()
+    {
+        topSpeed *= 2;
+        isSpeedDebuffing = false;
+        speedDebuffTimer = 0;
+    }
+
+    public static void cleanCarFlags()
+    {
+        waitForStartFlag = true;
+        gameIsOver = false;
+    }
 
 }

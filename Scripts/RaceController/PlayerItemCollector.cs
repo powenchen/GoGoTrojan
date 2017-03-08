@@ -5,30 +5,37 @@ using UnityEngine.UI;
 
 public class PlayerItemCollector : MonoBehaviour {
 
-	public Text coinCountText;
-	public Button ItemBtn;
-	public Text ItemBtnText;
+    public const int ITEM_LIST_LENGTH = 5;
 
-	// we have total 6 kinds of items and effects
-	//	1, missle		-> 射出擊中敵人扣血
-	//	2, land mine	-> 敵人碰到扣血
-	//	3, oil spill	-> 打滑
-	//	4, glue			-> 速度變慢一段時間
-	//	5, shield		-> 不受技能道具影響
-	//	6, lightning	-> 閃電劈所有敵人
+	//public Button ItemBtn;
+	//public Text ItemBtnText;
 
-	private int numOfItems = 2;
+    public int itemIdx = -1;
 
-	// number of coins
-	private int coinCount;
+    private float itemPutOffset = 5;
+
+    public GameObject[] itemLists = new GameObject[ITEM_LIST_LENGTH];
+
+    // we have total 6 kinds of items and effects
+    //	1, missle		-> 射出擊中敵人扣血
+    //	2, land mine	-> 敵人碰到扣血
+    //	3, oil spill	-> 打滑
+    //	4, glue			-> 速度變慢一段時間
+
+    //	5, lightning	-> 閃電劈所有敵人 (TODO)
+    //	6, shield		-> 不受技能道具影響 (TODO)
+
+    // private int numOfItems = 2;
+
+    // number of coins
+    public int coinCount;
+    private float lightningDamage = 20;
 
 	// if play doesn't collect an item, the default itemValue = 0;
-	private int itemValue = 0;
+	//private int itemValue = 0;
 
 	// Use this for initialization
 	void Start () {
-		
-		coinCountText.text = "coin x 0";
 		coinCount = 0;
 	}
 	
@@ -41,81 +48,68 @@ public class PlayerItemCollector : MonoBehaviour {
 	// 1. coin
 	// 2. heart
 	// 3. poison
-	// 4. box (randomly generate items)
+	// 4. box (randomly generate items) //(arrow?!)
 
 	void OnTriggerEnter(Collider other) 
 	{
-		
-		if (other.gameObject.CompareTag ("Coin"))
-		{
-			other.gameObject.SetActive (false);
-			coinCount++;
-			coinCountText.text = "coin x " + coinCount.ToString();
-		}
-
-		if (other.gameObject.CompareTag ("Heart")) 
-		{
-			other.gameObject.SetActive (false);
-
-			// implement addHP(amount);
-			GameObject.Find ("RegularC").SendMessage("AddHealth", 20);
-		}
-
-		if (other.gameObject.CompareTag ("Poison")) 
-		{
-			other.gameObject.SetActive (false);
-
-			// implement minusHP(amount);
-			GameObject.Find ("RegularC").SendMessage("TakeDamage", 50);
-		}
-
-		if (other.gameObject.CompareTag ("Arrow")) {
-			other.gameObject.SetActive (false);
-
-			ItemBtn.interactable = true;
-
-			int randomValue = Random.Range(1, numOfItems + 1);
-
-			SetItemValue (randomValue);
-
-			switch (randomValue) {
-				
-			case 1:
-				ItemBtnText.text = "missle";
-				break;
-//			case 2:
-//				ItemBtnText.text = "land mine";
-//				break;
-			case 2:
-				ItemBtnText.text = "lightning";
-				break;
-			case 3:
-				ItemBtnText.text = "oil spill";
-				break;
-			case 4:
-				ItemBtnText.text = "glue";
-				break;
-			case 5:
-				ItemBtnText.text = "shield";
-				break;
-			case 6:
-				ItemBtnText.text = "lightning";
-				break;
-			}
-		}
+        if (other.GetComponent<PickupRotate>() != null)
+        {
+            if (other.GetComponent<Coin>() != null)
+            {
+                //get coin
+                PlayerPrefs.SetInt("TotalCoins", PlayerPrefs.GetInt("TotalCoins") + 1);
+                PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") + 1);
+                coinCount += other.GetComponent<Coin>().getCoinValue();
+            }
+            else
+            {
+                itemIdx = Random.Range(0, itemLists .Length);
+            }
+            Destroy(other.gameObject);
+        }
 
 
 	}
 
-	void SetItemValue(int value) {
-	
-		itemValue = value;
-	}
 
-	public int GetItemValue() {
+    public void useItem()
+    {
+        if (itemIdx != -1)
+        {
+            if (itemIdx == 0)// missile is a special case
+            {
+                Vector3 spawnPosition = transform.position + 2 * transform.forward * itemPutOffset;
+                Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y, 0));
+                Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, transform);
+            }
+            else if (itemIdx == 4) // lightning is a special case
+            {
+                foreach (Car car in FindObjectsOfType<Car>())
+                {
+                    if (!car.Equals(GetComponent<Car>()))
+                    {
+                        Vector3 spawnPosition = car.transform.position;
+                        Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+                        Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, car.transform);
+                        car.decreaseHP(lightningDamage);
+                    }
+                }
+            }
+            else
+            {
+                Vector3 spawnPosition = transform.position - transform.forward * itemPutOffset;
+                Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+                Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation);
+            }
+            itemIdx = -1;
 
-		return itemValue;
-	}
+        }
+    }
+
+    public int GetItemValue()
+    {
+        return itemIdx;
+    }
 
 	public int GetCoinNumber() {
 	

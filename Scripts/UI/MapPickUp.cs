@@ -34,6 +34,7 @@ public class MapPickUp : MonoBehaviour {
 	}
 
 	public void Confirm() {
+        PlayerPrefs.SetInt("CourseID", routePicked-1);
 		SceneManager.LoadScene ("CharacterPickUp");
 	}
 

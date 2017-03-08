@@ -6,11 +6,16 @@ public class DestroyByBoundary : MonoBehaviour
 	void OnTriggerEnter(Collider other) 
 	{
 		
-		if (other.tag == "Enemy")
+		if (other.tag == "Player0")
 		{
 			Instantiate(explosion, other.transform.position, other.transform.rotation);
-			//Destroy(other.gameObject);
-			Destroy(gameObject);
+
+			//implement takeDamage();
+			other.gameObject.SendMessage("takeDamage", 50);
+
+			//implement Stop()
+
+			//Destroy(gameObject);
 		}
 	}
 }

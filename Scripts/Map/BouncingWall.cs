@@ -6,7 +6,7 @@ public class BouncingWall : MonoBehaviour
 {
    // public ParticleSystem sparkOnContact;
     private Rigidbody rb;
-    public float maxTorque = 200;
+    public float maxTorque = 100;
     private Car m;
     // Use this for initialization
     void Start()

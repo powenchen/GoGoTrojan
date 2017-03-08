@@ -25,14 +25,14 @@ public class PlayerController : MonoBehaviour {
         }
         
         float motorTorqueFactor = 1;// * Input.GetAxis("Vertical");
-        float brakeTorqueFactor = Input.GetAxis("Jump");
+        float brakeTorqueFactor = 0;//Input.GetAxis("Jump");
 
         car.ApplyPedal(motorTorqueFactor, brakeTorqueFactor);
 
         
 
 
-        float steerFactor = Input.GetAxis("Horizontal");// Input.acceleration.x;
+        float steerFactor = Input.GetAxis("Horizontal");   // Input.acceleration.x;
 
         car.ApplySteer(steerFactor);
 

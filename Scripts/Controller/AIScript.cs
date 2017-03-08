@@ -148,7 +148,7 @@ public class AIScript : MonoBehaviour {
         RaycastHit hit;
         
         //braking sensor
-        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
+        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain") && hit.transform.GetComponent<carCheckPoint>() == null)
         {
             ++flag;
             if (!reversing)
@@ -167,13 +167,13 @@ public class AIScript : MonoBehaviour {
         pos = transform.position;
         pos += transform.forward * frontSensorStartPoint + transform.right*frontSensorMargin;
         Vector3 sensorAngle = Quaternion.AngleAxis(frontSensorAngle, transform.up) * transform.forward;
-        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
+        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && hit.transform.GetComponent<carCheckPoint>() == null && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity -= 1;
             Debug.DrawLine(pos, hit.point, Color.white);
         }
-        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
+        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) && hit.transform.GetComponent<carCheckPoint>() == null && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity -= 0.5f;
@@ -186,13 +186,13 @@ public class AIScript : MonoBehaviour {
         pos += transform.forward * frontSensorStartPoint - transform.right * frontSensorMargin;
 
         sensorAngle = Quaternion.AngleAxis(-frontSensorAngle, transform.up) * transform.forward;
-        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
+        if (Physics.Raycast(pos, transform.forward, out hit, sensorLength) && hit.transform.GetComponent<carCheckPoint>() == null && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity += 1;
             Debug.DrawLine(pos, hit.point, Color.white);
         }
-        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) && !hit.transform.CompareTag("Terrain"))
+        else if (Physics.Raycast(pos, sensorAngle, out hit, sensorLength) && hit.transform.GetComponent<carCheckPoint>() == null && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity += 0.5f;
@@ -200,7 +200,7 @@ public class AIScript : MonoBehaviour {
         }
 
         //right side sensor
-        if (Physics.Raycast(transform.position, transform.right, out hit, sideSensorLength) && !hit.transform.CompareTag("Terrain"))
+        if (Physics.Raycast(transform.position, transform.right, out hit, sideSensorLength) && hit.transform.GetComponent<carCheckPoint>() == null && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity -= 0.5f;
@@ -208,7 +208,7 @@ public class AIScript : MonoBehaviour {
         }
 
         //left side sensor
-        if (Physics.Raycast(transform.position, -transform.right, out hit, sideSensorLength) && !hit.transform.CompareTag("Terrain"))
+        if (Physics.Raycast(transform.position, -transform.right, out hit, sideSensorLength) && hit.transform.GetComponent<carCheckPoint>() == null && !hit.transform.CompareTag("Terrain"))
         {
             ++flag;
             avoidSensitivity += 0.5f;

@@ -30,10 +30,11 @@ public class StartPointManager : MonoBehaviour {
 
     public Vector3[] startPositions()
     {
-        Vector3[] ret = new Vector3[startPoints.Length];
-        for (int i = 0; i < startPoints.Length; ++i)
+        startPoints = GetComponentsInChildren<Transform>();
+        Vector3[] ret = new Vector3[startPoints.Length-1];
+        for (int i = 1; i < startPoints.Length; ++i)
         {
-            ret[i] = startPoints[i].position;
+            ret[i-1] = startPoints[i].position;
         }
 
         return ret;

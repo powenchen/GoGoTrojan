@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class raceManager : MonoBehaviour {
-
+    /*
 	public Button gameOverBtn;
 	public Image StatImage;
 //	public PlayerItemCollector player;
@@ -108,5 +108,5 @@ public class raceManager : MonoBehaviour {
 		default:
 			return num + "th";
 		}
-	}
+	}*/
 }

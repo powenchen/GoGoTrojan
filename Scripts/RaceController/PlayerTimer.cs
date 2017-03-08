@@ -17,9 +17,13 @@ public class PlayerTimer : MonoBehaviour {
 	int testTime;
 	bool finished;
 	bool canStartRacing;
+    // Use this for initialization
+    void Start () {
 
-	// Use this for initialization
-	void Start () {
+        //
+
+        timerText.color = Color.red;
+        Car.cleanCarFlags();
 		startTime = Time.time;
 		preTimerText.text = "";
 //		testTime = 1;
@@ -28,7 +32,10 @@ public class PlayerTimer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        if (Car.gameIsOver)
+        {
+            Finish();
+        }
 		if (finished) {
 			return;
 		}
@@ -48,48 +55,30 @@ public class PlayerTimer : MonoBehaviour {
 		} 
 
 		else {
+            //startrunning
 
-			if (!canStartRacing) {
-
-				GameObject.Find ("RegularC").SendMessage("setStartRacing");
-				GameObject.Find ("RaceC").SendMessage("setStartRacing");
-				GameObject.Find ("RegularC").SendMessage("SetCDstarts");
-				GameObject.Find ("RaceC").SendMessage("SetCDstarts");
-				canStartRacing = true;
-			}
-
-			preTimerText.text = "";
+            Car.waitForStartFlag = false;
+            preTimerText.text = "";
 
 			float timer = Time.time - departTime;
 			totalMinute = ((int)timer / 60).ToString ("D2");
 			totalSecond = ((int)timer % 60).ToString ("D2");
 			totalMiliSecond = ((int)(timer * 100) % 100).ToString ("D2");
-			timerText.text = "TIME\n" + totalMinute + ":" + totalSecond + ":" + totalMiliSecond;
+			timerText.text =totalMinute + ":" + totalSecond + ":" + totalMiliSecond;
 
 
 		}
 	}
 
-	void OnTriggerEnter(Collider other) {
 
-		if (other.gameObject.CompareTag ("FinishLine"))
-		{
-			Finnish ();
-		}
-	
-	}
-
-	void Finnish() {
+	void Finish() {
 		timerText.color = Color.yellow;
 		finished = true;
-		GameObject.Find ("RegularC").SendMessage("setGameOver");
-		GameObject.Find ("RaceC").SendMessage("setStopRacing");
-		GameObject.Find ("RegularC").SendMessage("SetCDstops");
-		GameObject.Find ("RegularC").SendMessage("GameOver");
+        //stop all cars
 
 	}
 
-	public void DeathFinnish() {
+	/*public void DeathFinish() {
 		timerText.color = Color.red;
 		finished = true;
 		GameObject.Find ("RegularC").SendMessage("setGameOver");
@@ -97,7 +86,7 @@ public class PlayerTimer : MonoBehaviour {
 		GameObject.Find ("RegularC").SendMessage("SetCDstops");
 		GameObject.Find ("RegularC").SendMessage("GameOver");
 
-	}
+	}*/
 
 	public string GetTotalTime() {
 		string result = totalMinute + ":" + totalSecond + ":" + totalMiliSecond;

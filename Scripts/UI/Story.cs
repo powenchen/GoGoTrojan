@@ -11,6 +11,7 @@ public class Story : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Debug.Log (PlayerPrefs.GetFloat("Player1_Health"));
 		confirmText = confirmText.GetComponent<Button> ();
 		backText = backText.GetComponent<Button> ();
 	}

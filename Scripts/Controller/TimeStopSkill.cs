@@ -9,8 +9,8 @@ public class TimeStopSkill : Skill
 
     private float StopTime = 1;
     public float StopTimerCurr = 0;
-    private bool isStopping = false;
-    private bool isStoppingReady = true;
+    private bool skillUsing = false;
+    private bool isSkillReady = true;
 
     public GameObject[] enemies;
     
@@ -25,7 +25,7 @@ public class TimeStopSkill : Skill
 	// Update is called once per frame
 	void Update () {
         //Debug.Log("stop test; position variation = " + Time.fixedDeltaTime * GetComponent<Car>().getTopSpeed() * transform.forward);
-        if (isStopping)
+        if (skillUsing)
         {
             StopTimerCurr += Time.fixedDeltaTime;
             foreach (GameObject enemy in enemies)
@@ -53,27 +53,29 @@ public class TimeStopSkill : Skill
 
     public override void stopSkill()
     {
-
-        isStoppingReady = true;
-        isStopping = false;
-        changeGrayScaleLayer("Default");
-        mainCamera.enabled = false;
-        grayScaleScript.enabled = false;
-
-
-        foreach (GameObject enemy in enemies)
+        if (skillUsing)
         {
-            enemy.GetComponent<Car>().startRunning();
+            isSkillReady = true;
+            skillUsing = false;
+            changeGrayScaleLayer("Default");
+            mainCamera.enabled = false;
+            grayScaleScript.enabled = false;
+
+
+            foreach (GameObject enemy in enemies)
+            {
+                enemy.GetComponent<Car>().startRunning();
+            }
+            StopTimerCurr = 0;
         }
-        StopTimerCurr = 0;
     }
 
     public override void activateSkill()
     {
-        if (isStoppingReady && !isStopping)
+        if (isSkillReady && !skillUsing)
         {
-            isStoppingReady = false;
-            isStopping = true;
+            isSkillReady = false;
+            skillUsing = true;
 
             changeGrayScaleLayer("quickSilver");
             mainCamera.enabled = true;
@@ -83,6 +85,8 @@ public class TimeStopSkill : Skill
 
     }
 
-
-
+    public bool isSkillUsing()
+    {
+        return skillUsing;
+    }
 }

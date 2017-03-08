@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Coin : MonoBehaviour {
 
-	public int spinSpeed = 1;
+    private int coinValue = 1;
 
 	// Use this for initialization
 	void Start () {
@@ -12,7 +12,7 @@ public class Coin : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		transform.Rotate (new Vector3(0,90,0) * Time.deltaTime * spinSpeed);
+	public int getCoinValue () {
+        return coinValue;
 	}
 }

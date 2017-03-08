@@ -32,11 +32,15 @@ public class PathManager : MonoBehaviour
 
     public Vector3 startPositionOfPath()
     {
+
+        pathArray = GetComponentsInChildren<Transform>();
         return pathArray[1].position;
     }
 
     public Quaternion startRotationOfPath()
     {
+
+        pathArray = GetComponentsInChildren<Transform>();
         //Vector3 x = new Vector3(1, 0, 0), z = new Vector3(0, 0, 1), o = new Vector3(0, 0, 0);
         //Quaternion x_p = Quaternion.FromToRotation(x, o), x_n = Quaternion.FromToRotation(o, x);
         //Quaternion z_p = Quaternion.FromToRotation(z, o), z_n = Quaternion.FromToRotation(o,z);
@@ -46,11 +50,15 @@ public class PathManager : MonoBehaviour
 
     public Vector3 endPositionOfPath()
     {
+
+        pathArray = GetComponentsInChildren<Transform>();
         return pathArray[pathArray.Length - 1].position;
     }
 
     public Quaternion endRotationOfPath()
     {
+
+        pathArray = GetComponentsInChildren<Transform>();
         return Quaternion.FromToRotation(Vector3.up, pathArray[pathArray.Length - 1].position - pathArray[pathArray.Length - 2].position);
     }
 }

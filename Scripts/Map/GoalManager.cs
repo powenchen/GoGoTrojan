@@ -5,37 +5,60 @@ using UnityEngine.UI;
 
 public class GoalManager : MonoBehaviour {
     private bool isOver = false;
-    private int status = 0; // 1=win, 0 = no result, -1 = lose
+    public StatImageManager statImage;
     // Use this for initialization
     void Start () {
-	}
+
+        statImage.gameObject.SetActive(false);
+    }
 	
 	// Update is called once per frame
 	void Update () {
-	}
+        if (isOver )
+        {
+            statImage.gameObject.SetActive(true);
+            if (!Car.gameIsOver)
+            {
+                Car.gameIsOver = true;
+            }
+            return;
+        }
+        if (FindObjectOfType<PlayerController>().GetComponent<Car>().getHP() == 0)
+        {
+            statImage.isWin = false;
+            isOver = true;
+            return;
+
+        }
+        if (FindObjectsOfType<AIScript>().Length == 0)
+        {
+            statImage.isWin = true;
+            isOver = true;
+            return;
+
+        }
+
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.tag);
-        if (other.CompareTag("Player") && !isOver)
+        Debug.Log(other.name);
+        if (!isOver)
         {
-            status = 1;
-            isOver = true;
+            if (other.GetComponent<AIScript>() != null) //lose
+            {
+                statImage.isWin = false;
+                isOver = true;
 
-        }
-        else if (other.CompareTag("Enemy") && !isOver)
-        {
-            status = -1;
-            isOver = true;
+            }
+            else if (other.GetComponent<PlayerController>() != null) // win
+            {
+                statImage.isWin = true;
+                isOver = true;
 
+            }
         }
     }
-
-    //status = 0 no result yet
-    //status = 1 win
-    //status = -1 lose
-    public int getStatus()
-    {
-        return status;
-    }
+    
+    
 }

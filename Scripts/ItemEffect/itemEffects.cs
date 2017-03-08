@@ -5,15 +5,26 @@ using UnityEngine.UI;
 
 public class itemEffects : MonoBehaviour {
 
-	public GameObject bullet;
-	public GameObject thunder;
-	public Text testText;
-	public GameObject[] allEnemy;
-	//public GameObject enemy;
+	public GameObject missile;
+	public GameObject landMine;
+	public GameObject oilSpill;
+	public GameObject glue;
+//	public GameObject shield;
+	public GameObject lightning;
+
+	public GameObject frontSpawn;
+	public GameObject backSpawn;
+
+	public ParticleSystem shieldPS;
+
+	private bool ShieldEquipped;
+
+	public GameObject[] Players;
+
 
 	// Use this for initialization
 	void Start () {
-		testText.text = "effect: ";
+		
 	}
 
 	// Update is called once per frame
@@ -23,24 +34,20 @@ public class itemEffects : MonoBehaviour {
 
 	public void UseItem(int itemValue) {
 
-		// 1, missle 		-> HP - 30										射出擊中敵人扣血
-		// 2, land mine		-> HP - 30										敵人經過上方扣血
-		// 3, oil spill		-> spin?										原地打滑
-		// 4, glue			-> speed slows down								速度變慢
-		// 5, shield		-> items can't affect the player for 5 seconds	防護罩
-		// 6, sprint		-> speed increase								衝刺
-		// 7, lightning		-> all player HP - 20							閃電
-		// 8, time freeze	-> all player stop for 3 seconds				時間停止器, 畫面變灰階
+		// we have total 6 kinds of items and effects
+		//	1, missle		-> 射出擊中 敵人減速 & 扣血
+		//	2, land mine	-> 敵人碰到減速 & 扣血
+		//	3, oil spill	-> 打滑 & 減速
+		//	4, glue			-> 速度變慢一段時間
+		//	5, shield		-> 不受道具效果影響
+		//	6, lightning	-> 閃電全範圍扣血
 
 		switch (itemValue) {
 		case 1:
 			Missle ();
 			break;
-//		case 2:
-//			LandMine ();
-//			break;
 		case 2:
-			Lightning ();
+			LandMine ();
 			break;
 		case 3:
 			OilSpill ();
@@ -60,49 +67,70 @@ public class itemEffects : MonoBehaviour {
 	}
 
 	public void Missle() {
-		testText.text = "effect: missle!";		
-		Instantiate(bullet,transform.position,transform.rotation);
-		//GameObject.Find ("RegularC").SendMessage("TakeDamage", 20);
+
+		// generate a missile
+
+		Instantiate(missile,frontSpawn.transform.position,frontSpawn.transform.rotation);
 	}
 
 	public void LandMine() {
-		testText.text = "effect: Land Mine!";
+
+		Instantiate(landMine,backSpawn.transform.position,backSpawn.transform.rotation);
 	}
 
 	public void OilSpill() {
-		testText.text = "effect: Oil Spill!";
+
+		Instantiate(oilSpill,transform.position,transform.rotation);
 	}
 
 	public void Glue() {
-		testText.text = "effect: Glue!";
+
+		Instantiate(glue,transform.position,transform.rotation);
 	}
 
 	public void Shield() {
-		testText.text = "effect: Shield!";
+		
+		shieldPS.Play ();
+		ShieldEquipped = true;
+		Debug.Log ("USE SHIELD");
+		Invoke ("UnequipShield", 3);
 	}
 
-	public void Sprint() {
-		testText.text = "effect: Sprint!";
+
+	void UnequipShield() {
+		Debug.Log ("NO SHIELD NOW");
+		ShieldEquipped = false;
 	}
+
+	public bool IsShieldEquipped() {
+	
+		return ShieldEquipped;
+	}
+
 
 	public void Lightning() {
-		testText.text = "effect: Lightning!";
-		GameObject enemy = GameObject.Find ("RaceC");
-		Instantiate(thunder, enemy.transform.position, enemy.transform.rotation);
-		enemy.SendMessage("takeDamage", 20);
 
-//		allEnemy = GameObject.FindGameObjectsWithTag("Enemy");
-//		foreach(GameObject enemy in allEnemy)
-//		{
-//			EnemyController ec = enemy.GetComponent<EnemyController> ();
-//			Instantiate(thunder, enemy.transform.position, enemy.transform.rotation);
-//			ec.takeDamage (20);
-////			enemy.SendMessage("takeDamage", 20);
-//		}
+//		GameObject enemy = GameObject.Find ("RaceC");
+//		Instantiate(lightning, enemy.transform.position, enemy.transform.rotation);
+//		enemy.SendMessage("TakeDamage", 20);
+
+
+		// attack all players!
+		foreach (GameObject go in Players) {
+
+			if (!go.tag.Equals(gameObject.tag)) {
+
+				Instantiate(lightning, go.transform.position, go.transform.rotation);
+
+//				itemEffects ie = go.GetComponent<itemEffects> ();
+//				if (!ie.IsShieldEquipped ()) {
+					go.SendMessage ("TakeDamage", 20);
+//				}
+
+			}
+		}
+
 
 	}
-
-	public void TimeFreeze() {
-		testText.text = "effect: Time Freeze!";
-	}
+		
 }

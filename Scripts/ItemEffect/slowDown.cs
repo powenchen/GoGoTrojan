@@ -17,17 +17,16 @@ public class slowDown : MonoBehaviour {
     private void OnTriggerEnter(Collider other)
     {
        // Debug.Log("triggered!!! tag = "+other.tag);
-        if (other.CompareTag("Enemy") || other.CompareTag("Player"))
+        if (other.CompareTag("Enemy") || other.CompareTag("Player")) // todo
         {
-            other.transform.root.GetComponent<Car>().speedDebuff(slowDownRatio);
+            other.transform.root.GetComponent<Car>().speedDebuff();
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Enemy")||other.CompareTag("Player"))
+        if (other.CompareTag("Enemy") || other.CompareTag("Player"))
         {
-            other.transform.root.GetComponent<Car>().removeDebuff(slowDownRatio);
         }
     }
 }
