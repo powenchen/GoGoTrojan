@@ -51,7 +51,7 @@ public class StatBtnOnClick : MonoBehaviour
             statManager.gameObject.SetActive(false);
 
             SceneManager.LoadScene("RaceSummary");
-
+            PlayerPrefs.SetInt("Ranking",999);
             foreach (AudioSource audio in FindObjectsOfType<AudioSource>())
             {
                 audio.Play();

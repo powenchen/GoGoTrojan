@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour {
         
 
 
-        float steerFactor = Input.GetAxis("Horizontal");   // Input.acceleration.x;
+        float steerFactor = Input.GetAxis("Horizontal");     //Input.acceleration.x;
 
         car.ApplySteer(steerFactor);
 

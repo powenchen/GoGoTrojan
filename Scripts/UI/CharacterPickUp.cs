@@ -45,7 +45,7 @@ public class CharacterPickUp : MonoBehaviour {
 	}
 
 	public void Store() {
-		//SceneManager.LoadScene ();
+		SceneManager.LoadScene ("CharacterAttributes");
 	}
 
 	public void NextCharacter() {

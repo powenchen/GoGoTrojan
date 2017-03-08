@@ -48,7 +48,7 @@ public class CarPickUp : MonoBehaviour {
 	}
 
 	public void Store() {
-		//SceneManager.LoadScene("CharacterPickUp");
+		SceneManager.LoadScene("CharacterAttributes");
 	}
 
 	public void NextCar() {

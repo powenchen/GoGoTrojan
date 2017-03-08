@@ -133,12 +133,12 @@ public class MapGen : MonoBehaviour
         hp = 100;
         mp = 100;
         atk = 100;
-        skillCD = 100;
-        speed = 200;
+        skillCD = 50;
+        speed = 80;
         Debug.Log("CourseID = " + PlayerPrefs.GetInt("CourseID"));
         initCharacter(PlayerPrefs.GetInt("CourseID"), id, hp,mp, atk, speed, skillCD,0, true);
 
-        initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100,100,100, 1, false);
+        initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100,150,100, 1, false);
         //initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100, 2, false);
 
 

@@ -63,7 +63,28 @@ public class PlayerItemCollector : MonoBehaviour {
             }
             else
             {
-                itemIdx = Random.Range(0, itemLists .Length);
+                //itemIdx = Random.Range(0, itemLists .Length);
+                int total = 1000;
+                int rng = Random.Range(0, total);
+                if (rng < 25)
+                {
+                    itemIdx = 0;
+                }
+                else if (rng < 50)
+                {
+                    itemIdx = 1;
+                }
+                else if (rng < 75)
+                {
+                    itemIdx = 2;
+                }
+                else if (rng < 100)
+                {
+                    itemIdx = 3;
+                }
+                else {
+                    itemIdx = 4;
+                }
             }
             Destroy(other.gameObject);
         }
