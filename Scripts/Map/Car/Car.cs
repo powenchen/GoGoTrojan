@@ -137,7 +137,7 @@ public class Car : MonoBehaviour
 
     void FixedUpdate()
     {
-        Debug.Log("static flags = (" + StaticVariables.gameStarts + "," + StaticVariables.gameIsOver + ")");
+        //Debug.Log("static flags = (" + StaticVariables.gameStarts + "," + StaticVariables.gameIsOver + ")");
         if (!StaticVariables.gameStarts || StaticVariables.gameIsOver || stoppedBySkill)
         {
             stopRunning();

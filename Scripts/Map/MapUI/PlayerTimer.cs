@@ -53,7 +53,7 @@ public class PlayerTimer : MonoBehaviour {
 		else if(testTime < 0){
             //startrunning
 
-            Debug.Log("GAME START");
+            //Debug.Log("GAME START");
             StaticVariables.gameStarts = true;
             preTimerText.text = "";
 
