@@ -5,7 +5,7 @@ using UnityEngine;
 public class CarStatus : MonoBehaviour {
 
     public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
-
+    public float topSpeedModifier = 1;
     public float currHP = 100;
     public float maxHP = 100;
     public float currMP = 100;

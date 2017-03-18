@@ -11,7 +11,7 @@ public class Car : MonoBehaviour
     private float maxSteerAngle = 15;
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
     public Text speedText;
-    public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
+    //public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
     public float carVelocity;
 
     
@@ -133,6 +133,12 @@ public class Car : MonoBehaviour
         {
             speedText.text = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f + " km/h";
         }
+
+        if (rb.velocity.magnitude > status.topSpeed*status.topSpeedModifier)
+        {
+            float slowDownRatio = rb.velocity.magnitude / (status.topSpeed * status.topSpeedModifier);
+            rb.velocity /= slowDownRatio;
+        }
     }
 
     void FixedUpdate()
@@ -145,11 +151,7 @@ public class Car : MonoBehaviour
         }
         startRunning();
                 
-        if (rb.velocity.magnitude > topSpeed)
-        {
-            float slowDownRatio = rb.velocity.magnitude / topSpeed;
-            rb.velocity /= slowDownRatio;
-        }
+        
     }
     
 
@@ -220,12 +222,12 @@ public class Car : MonoBehaviour
 
     public void setTopSpeed(float speed)
     {
-        topSpeed = speed;
+        status.topSpeed = speed;
     }
 
     public float getTopSpeed()
     {
-        return topSpeed;
+        return status.topSpeed;
     }
 
     private void diasbleAllController()
@@ -405,14 +407,14 @@ public class Car : MonoBehaviour
 
     public void speedDebuff()
     {
-        topSpeed /= 2;
+        status.topSpeedModifier = 0.5f;
         isSpeedDebuffing = true;
         speedDebuffTimer = 0;
     }
 
     public void removeSpeedDebuff()
     {
-        topSpeed *= 2;
+        status.topSpeedModifier = 1;
         isSpeedDebuffing = false;
         speedDebuffTimer = 0;
     }

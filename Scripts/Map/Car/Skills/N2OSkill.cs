@@ -6,7 +6,9 @@ public class N2OSkill : Skill
 {
 
     private Rigidbody rb;
-    private float N2OPower = 20;
+    private float N2OPower = 5;
+    private float N2OTopSpeedModifier = 1.05f;
+    private float originalTopSpeed = 2;
     public ParticleSystem[] N2OParticles;
 
     private float N2OTimer = 0;
@@ -33,7 +35,7 @@ public class N2OSkill : Skill
         if (isN2OEmitting)
         {
             if (Time.time - N2OTimer < N2OTime)
-            {
+            { 
                 rb.AddForce(transform.forward * N2OPower, ForceMode.Acceleration);
             }
             else
@@ -53,6 +55,8 @@ public class N2OSkill : Skill
         {
             N2O.Stop();
         }
+
+        GetComponent<CarStatus>().topSpeedModifier = 1;
         N2OTimer = 0;
     }
 
@@ -61,6 +65,8 @@ public class N2OSkill : Skill
         //Debug.Log("inheritance called");
         skillSound.volume = 1;
 
+        //originalTopSpeed = GetComponent<CarStatus>().topSpeed;
+        GetComponent<CarStatus>().topSpeedModifier = N2OTopSpeedModifier ;
         if (isN2OReady && !isN2OEmitting)
         {
             isN2OReady = false;

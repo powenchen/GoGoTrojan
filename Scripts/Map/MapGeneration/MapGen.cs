@@ -34,6 +34,7 @@ public class MapGen : MonoBehaviour
     public itemBtnOnClick itemBtn;
     public moveBtnOnClick moveBtn;
     public StatImageManager statImage;
+    private float basicTopSpeed = 27;
 
     // Use this for initialization; used for debug
     void OnDrawGizmos ()
@@ -92,7 +93,7 @@ public class MapGen : MonoBehaviour
         Debug.Log("CourseID = " + PlayerPrefs.GetInt("CourseID"));
         initCharacter(PlayerPrefs.GetInt("CourseID"), id, hp,mp, atk, speed, skillCD,0, true);
 
-        initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100,150,100, 1, false);
+        initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100,150,50, 1, false);
         //initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100, 2, false);
 
 
@@ -193,7 +194,7 @@ public class MapGen : MonoBehaviour
         car.HPInitialize(maxHP);
         car.MPInitialize(maxMP);
         car.skillCDInitialize(skillCD);
-        car.setTopSpeed(car.getTopSpeed() * (1f+(speed / 1000f)));//speed = 100pt = 1.1times
+        car.setTopSpeed(basicTopSpeed * (1+(speed / 1000f)));//speed = 100pt = 1.1times
 
         mark.transform.parent = miniMap.transform;
         marks[racerNum] = mark;
