@@ -27,9 +27,9 @@ public class RaceSummary : MonoBehaviour {
 		}
 
 		coin = PlayerPrefs.GetInt ("Coins");
-		rank = PlayerPrefs.GetInt("Ranking");
+		rank = StaticVariables.ranking;
 		time = PlayerPrefs.GetString ("TotalTime");
-
+        Debug.Log("rank = "+rank);
 		if (rank == 1) {
 			grade.text = "A";
 			description.text = "CONGRATULATIONS!\nYou were the FIRST ONE who reached the classroom!! You spent " + time + " to reach the classroom. Professor was very happy and decided to give you a BIG A!!";

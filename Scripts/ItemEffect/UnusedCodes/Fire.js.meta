@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: bb2c96e032dac48e599be095260ab936
+timeCreated: 1488348704
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - bullet: {fileID: 152490, guid: e3212aa3cff9c9745bd1a8f4def6ad1c, type: 2}
+  - missil: {fileID: 1000011797152326, guid: acf39d9f4addf294d93fa56fa373961b, type: 2}
+  - mine: {fileID: 1000013462590818, guid: ecdd96beb7f93494880c052dfccf9dc1, type: 2}
+  - oil: {instanceID: 0}
+  - glue: {fileID: 100000, guid: 1a434115905d14330b9a30cf42e84045, type: 2}
+  - shield: {instanceID: 0}
+  - thunder: {fileID: 100000, guid: 9680fdee2d8014d93863eb27387ae851, type: 2}
+  - damage: {fileID: 100000, guid: 7f0d6f95be4f84fe5bf3cfd3ffb7dd12, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
