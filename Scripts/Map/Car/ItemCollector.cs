@@ -28,7 +28,7 @@ public class ItemCollector : MonoBehaviour {
     // private int numOfItems = 2;
 
     // number of coins
-    public int coinCount;
+   // public int coinCount;
     private float lightningDamage = 20;
 
 	// if play doesn't collect an item, the default itemValue = 0;
@@ -36,7 +36,7 @@ public class ItemCollector : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		coinCount = 0;
+		//coinCount = 0;
 	}
 	
 	// Update is called once per frame
@@ -58,8 +58,9 @@ public class ItemCollector : MonoBehaviour {
             {
                 //get coin
                 PlayerPrefs.SetInt("TotalCoins", PlayerPrefs.GetInt("TotalCoins") + 1);
-                PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") + 1);
-                coinCount += other.GetComponent<Coin>().getCoinValue();
+                StaticVariables.coinNumber += other.GetComponent<Coin>().getCoinValue();
+                //PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") + 1);
+                //coinCount += other.GetComponent<Coin>().getCoinValue();
             }
             else if (other.GetComponent<Item>() != null)
             {
@@ -132,8 +133,8 @@ public class ItemCollector : MonoBehaviour {
         return itemIdx;
     }
 
-	public int GetCoinNumber() {
+	/*public int GetCoinNumber() {
 	
 		return coinCount;
-	}
+	}*/
 }

@@ -41,9 +41,9 @@ public class StatImageManager : MonoBehaviour {
         rightBtnText.text = "Continue";
         leftBtnText.text = "Play Again";
         
-        coinText.text = "Coins get: " + collector.GetCoinNumber().ToString();
-        timeText.text = "Time: " + GetComponentInParent<PlayerTimer>().GetTotalTime();
-        PlayerPrefs.SetString("TotalTime", GetComponentInParent<PlayerTimer>().GetTotalTime());
+        coinText.text = "Coins get: " + StaticVariables.coinNumber.ToString();
+        timeText.text = "Time: " + StaticVariables.raceTimeStr;
+        //PlayerPrefs.SetString("TotalTime", GetComponentInParent<PlayerTimer>().GetTotalTime());
         int rank = Mathf.Clamp(StaticVariables.ranking, 1, totalCarNum);
         winText.text = (rank == 1) ? "YOU WIN!" : "YOU LOSE!";
         rankText.text = "Rank: "+ rank.ToString() + "/"  + totalCarNum.ToString();

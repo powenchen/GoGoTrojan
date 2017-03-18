@@ -26,9 +26,9 @@ public class RaceSummary : MonoBehaviour {
 			Destroy (character1);
 		}
 
-		coin = PlayerPrefs.GetInt ("Coins");
+        coin = StaticVariables.coinNumber;//PlayerPrefs.GetInt ("Coins");
 		rank = StaticVariables.ranking;
-		time = PlayerPrefs.GetString ("TotalTime");
+        time = StaticVariables.raceTimeStr;//PlayerPrefs.GetString ("TotalTime");
         Debug.Log("rank = "+rank);
 		if (rank == 1) {
 			grade.text = "A";

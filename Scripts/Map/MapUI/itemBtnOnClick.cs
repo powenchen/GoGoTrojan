@@ -54,14 +54,14 @@ public class itemBtnOnClick : MonoBehaviour {
 
 	public void itemButtonOnClick () {
         
-        //ItemBtn.interactable = false;
-        itemIdx = -1;
+        if (itemIdx != -1)
+        {
+            itemIdx = -1;
 
-        ItemBtnText.text = "";
-		int itemValue = playerItemCollector.GetItemValue ();
-        //test.text = "itemValue = " + itemValue.ToString ();
+            ItemBtnText.text = "";
 
-        playerItemCollector.useItem();
+            playerItemCollector.useItem();
+        }
 
     }
 

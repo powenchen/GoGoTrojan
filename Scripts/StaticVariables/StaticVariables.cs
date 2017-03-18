@@ -6,11 +6,17 @@ public class StaticVariables : MonoBehaviour {
     public static int ranking = -1;
     public static bool gameIsOver = false;
     public static bool gameStarts = false;
+    public static string raceTimeStr = "";
+    public static int coinNumber = 0;
+    public static JSONObject saveData = null;
 
     public static void resetVariables()
     {
         ranking = -1;
         gameIsOver = false;
         gameStarts = false;
+        raceTimeStr = "";
+        coinNumber = 0;
+        // dont reset savedata
     }
 }

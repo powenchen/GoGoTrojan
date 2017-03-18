@@ -8,7 +8,6 @@ public class N2OSkill : Skill
     private Rigidbody rb;
     private float N2OPower = 5;
     private float N2OTopSpeedModifier = 1.05f;
-    private float originalTopSpeed = 2;
     public ParticleSystem[] N2OParticles;
 
     private float N2OTimer = 0;

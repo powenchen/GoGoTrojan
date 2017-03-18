@@ -52,7 +52,6 @@ public class PlayerTimer : MonoBehaviour {
 		}
 		else if(testTime < 0){
             //startrunning
-
             //Debug.Log("GAME START");
             StaticVariables.gameStarts = true;
             preTimerText.text = "";
@@ -63,8 +62,9 @@ public class PlayerTimer : MonoBehaviour {
 			totalMiliSecond = ((int)(timer * 100) % 100).ToString ("D2");
 			timerText.text =totalMinute + ":" + totalSecond + ":" + totalMiliSecond;
 
+            StaticVariables.raceTimeStr = totalMinute + ":" + totalSecond + ":" + totalMiliSecond;
 
-		}
+        }
 	}
 
 
@@ -85,8 +85,8 @@ public class PlayerTimer : MonoBehaviour {
 
 	}*/
 
-	public string GetTotalTime() {
+	/*public string GetTotalTime() {
 		string result = totalMinute + ":" + totalSecond + ":" + totalMiliSecond;
 		return result;
-	}
+	}*/
 }
