@@ -38,8 +38,11 @@ public class RaceSummary : MonoBehaviour {
 			description.text = "UNFORTUNATELY...\nYou were NOT the first one who reached the classroom... You spent " + time + " to reach the classroom. As a result, you are not assigned an A... Try again!!";
 		}
 		description.text += "\nYou've eared " + coin + " coins during the race. You can go to store to make upgration!";
+        
+        description.text += StaticVariables.saveData.ToString(); //for debug
 
-	}
+
+    }
 	
 	// Update is called once per frame
 	void Update () {

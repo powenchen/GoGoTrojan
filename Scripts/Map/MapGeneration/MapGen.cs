@@ -36,6 +36,8 @@ public class MapGen : MonoBehaviour
     public StatImageManager statImage;
     private float basicTopSpeed = 27;
 
+    private AudioSource audio;
+
     // Use this for initialization; used for debug
     void OnDrawGizmos ()
     {
@@ -56,6 +58,7 @@ public class MapGen : MonoBehaviour
     }
     void Start()
     {
+        audio = GetComponentInChildren<AudioSource>();
         resetMap();
         StaticVariables.resetVariables();
         skyBoxIdx = PlayerPrefs.GetInt("CourseID");
@@ -103,11 +106,16 @@ public class MapGen : MonoBehaviour
     }
     // Update is called once per frame
     void Update () {
+        if (StaticVariables.musicStartFlag && !audio.isPlaying)
+        {
+            audio.Play();
+        }
         racersLength = countRacers();
 	}
 
     public void resetMap()
     {
+        audio.Stop();
         foreach (Car car in racers)
         {
             if (car != null)

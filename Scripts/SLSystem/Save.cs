@@ -5,11 +5,11 @@ using System.IO;
 
 public class Save : MonoBehaviour {
 
-    public static void saveState()
+    public static void saveState(string filePath)
     {
         string saveStr = "";
         if (StaticVariables.saveData != null)
             saveStr = StaticVariables.saveData.ToString();
-        File.WriteAllText(Application.dataPath + "/Resources/savedata.json", saveStr);
+        File.WriteAllText(filePath, saveStr);
     }
 }
