@@ -39,7 +39,6 @@ public class RaceSummary : MonoBehaviour {
 		}
 		description.text += "\nYou've eared " + coin + " coins during the race. You can go to store to make upgration!";
         
-        description.text += StaticVariables.saveData.ToString(); //for debug
 
 
     }
