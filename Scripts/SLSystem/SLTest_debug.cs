@@ -30,15 +30,16 @@ public class SLTest_debug : MonoBehaviour
 
     private void changeSaveData()
     {
-        Debug.Log("old data = " + StaticVariables.saveData.ToString());
+		Debug.Log("old data = " + Application.persistentDataPath + "/savedata.json");
         foreach (JSONObject charItem in StaticVariables.saveData.GetField("characters").list)
         {
             //DO something
             charItem.SetField("SkillCD", charItem.GetField("SkillCD").n + 20);
         }
         //sample code
-        JSONObject charData = StaticVariables.GetCharacterStatus(0);
-        charData.SetField("MaxMP", charData.GetField("MaxMP").n + 10);
+		JSONObject charData = StaticVariables.GetCharacterStatus(0);
+		Debug.Log(charData.GetField("MaxMP"));
+		charData.SetField("MaxMP", charData.GetField("MaxMP").n + 10);
         charData.SetField("MaxHP", charData.GetField("MaxHP").n + 15);
 
 
