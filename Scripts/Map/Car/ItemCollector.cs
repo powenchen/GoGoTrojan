@@ -57,7 +57,7 @@ public class ItemCollector : MonoBehaviour {
             if (other.GetComponent<Coin>() != null)
             {
                 //get coin
-                PlayerPrefs.SetInt("TotalCoins", PlayerPrefs.GetInt("TotalCoins") + 1);
+                PlayerPrefs.SetInt("TotalCoins", PlayerPrefs.GetInt("TotalCoins") + 1); // TODO - modify this
                 StaticVariables.coinNumber += other.GetComponent<Coin>().getCoinValue();
                 //PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") + 1);
                 //coinCount += other.GetComponent<Coin>().getCoinValue();

@@ -36,8 +36,9 @@ public class CarPickUp : MonoBehaviour {
 	}
 
 	public void Confirm() {
-		// Call Map API to set car
-		PlayerPrefs.SetInt("CarID", whichCar);
+        // Call Map API to set car
+        //PlayerPrefs.SetInt("CarID", whichCar);
+        StaticVariables.carID = whichCar;
 
 		SceneManager.LoadScene("LA_large");
 

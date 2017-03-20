@@ -7,9 +7,14 @@ public class Save : MonoBehaviour {
 
     public static void saveState(string filePath)
     {
-        string saveStr = "";
         if (StaticVariables.saveData != null)
-            saveStr = StaticVariables.saveData.ToString();
-        File.WriteAllText(filePath, saveStr);
+        {
+            string saveStr = StaticVariables.saveData.ToString();
+            File.WriteAllText(filePath, saveStr);
+        }
+        else
+        {
+            Debug.LogError("Cannot save data since it's null");
+        }
     }
 }

@@ -36,8 +36,10 @@ public class CharacterPickUp : MonoBehaviour {
 	}
 
 	public void Confirm() {
-		PlayerPrefs.SetInt ("PlayerID", characterPicked);
-		SceneManager.LoadScene ("CarPickUp");
+        //PlayerPrefs.SetInt ("PlayerID", characterPicked);
+        StaticVariables.characterID = characterPicked;
+
+        SceneManager.LoadScene ("CarPickUp");
 	}
 
 	public void Goback() {

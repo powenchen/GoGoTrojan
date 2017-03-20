@@ -60,12 +60,13 @@ public class MapGen : MonoBehaviour
     {
         audio = GetComponentInChildren<AudioSource>();
         resetMap();
-        StaticVariables.resetVariables();
-        skyBoxIdx = PlayerPrefs.GetInt("CourseID");
-        setCourse(PlayerPrefs.GetInt("CourseID"));
-        
-        int id = PlayerPrefs.GetInt("PlayerID") + 2 * PlayerPrefs.GetInt("CarID");
-        PlayerPrefs.SetInt("Coins", 0);
+        StaticVariables.ResetVariables();
+        skyBoxIdx = StaticVariables.mapID;//PlayerPrefs.GetInt("CourseID");
+        setCourse(StaticVariables.mapID);
+
+        int id = StaticVariables.characterID + 2 * StaticVariables.carID;
+            //PlayerPrefs.GetInt("PlayerID") + 2 * PlayerPrefs.GetInt("CarID");//TODO - modify this
+        //PlayerPrefs.SetInt("Coins", 0);
         float hp;
         float mp;
         float atk;
@@ -93,10 +94,9 @@ public class MapGen : MonoBehaviour
         atk = 100;
         skillCD = 50;
         speed = 80;
-        Debug.Log("CourseID = " + PlayerPrefs.GetInt("CourseID"));
-        initCharacter(PlayerPrefs.GetInt("CourseID"), id, hp,mp, atk, speed, skillCD,0, true);
+        initCharacter(StaticVariables.mapID, id, hp,mp, atk, speed, skillCD,0, true);
 
-        initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100,150,50, 1, false);
+        initCharacter(StaticVariables.mapID, Random.Range(0, 3), 100, 100, 100,150,50, 1, false);
         //initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100, 2, false);
 
 

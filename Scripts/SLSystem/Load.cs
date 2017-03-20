@@ -8,6 +8,6 @@ public class Load : MonoBehaviour {
     {
         string jsonStr = File.ReadAllText(filePath);
         StaticVariables.saveData = new JSONObject(jsonStr);
-        Debug.Log("Char0 HP = " + StaticVariables.saveData.GetField("characters").list[0].GetField("MaxHP").ToString());
+        //Debug.Log("Char0 HP = " + StaticVariables.saveData.GetField("characters").list[0].GetField("MaxHP").ToString());
     }
 }

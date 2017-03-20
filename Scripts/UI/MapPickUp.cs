@@ -34,8 +34,10 @@ public class MapPickUp : MonoBehaviour {
 	}
 
 	public void Confirm() {
-        PlayerPrefs.SetInt("CourseID", routePicked-1);
-		SceneManager.LoadScene ("CharacterPickUp");
+        //PlayerPrefs.SetInt("CourseID", routePicked-1);
+        StaticVariables.mapID = routePicked - 1;
+
+        SceneManager.LoadScene ("CharacterPickUp");
 	}
 
 	public void GoBack() {
