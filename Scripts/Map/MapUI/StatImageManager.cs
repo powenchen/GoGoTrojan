@@ -22,7 +22,6 @@ public class StatImageManager : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-        totalCarNum = FindObjectsOfType<Car>().Length;
     }
 	
 	// Update is called once per frame
@@ -40,7 +39,8 @@ public class StatImageManager : MonoBehaviour {
         }
         rightBtnText.text = "Continue";
         leftBtnText.text = "Play Again";
-        
+
+        totalCarNum = FindObjectsOfType<Car>().Length;
         coinText.text = "Coins get: " + StaticVariables.coinNumber.ToString();
         timeText.text = "Time: " + StaticVariables.raceTimeStr;
         //PlayerPrefs.SetString("TotalTime", GetComponentInParent<PlayerTimer>().GetTotalTime());

@@ -28,6 +28,7 @@ public class rankingSystem : MonoBehaviour {
         int myDist = 0;
 
         Car[] cars = FindObjectsOfType<Car>();
+        totalCarNum = cars.Length;
         foreach (Car car in cars)
         {
             if (car.GetComponent<PlayerController>() != null)
@@ -53,6 +54,9 @@ public class rankingSystem : MonoBehaviour {
     public void setCarDist(Car car, int dist)
     {
         carDistMapping[car] = dist;
+        car.setRespawnIdx(dist);
     }
+
+
     
 }

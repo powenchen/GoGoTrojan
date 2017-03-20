@@ -5,12 +5,13 @@ using UnityEngine.UI;
 public class Car : MonoBehaviour
 {
     public const float FREEZE_DRAG = 100000;
+    public const float RUNNING_DRAG = 0;
+    public const float RUNNING_ANGULAR_DRAG = 10;
     private Vector3 com = new Vector3(0,0,0);
     private float maxMotorTorque = 10000;
     private float maxBrakeTorque = 30000;
     private float maxSteerAngle = 15;
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
-    public Text speedText;
     //public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
     public float carVelocity;
 
@@ -43,6 +44,10 @@ public class Car : MonoBehaviour
     private bool isSpeedDebuffing = false;
     private float speedDebuffTimer = 0;
 
+    private int respawnPositionIdx = -1;
+    private float reSpawnTime = 5;
+    private float reSpawnTimer = 0;
+
     private void Awake()
     {
         status = GetComponent<CarStatus>();
@@ -50,10 +55,6 @@ public class Car : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = com;
-        if (speedText != null)
-        {
-            speedText.text = "0 km/h";
-        }
         flController = frontLeft.GetComponent<WheelController>();
         frController = frontRight.GetComponent<WheelController>();
         rlController = rearLeft.GetComponent<WheelController>();
@@ -81,10 +82,17 @@ public class Car : MonoBehaviour
             }
 
         }
-        if (!stopFlag)
+        if (!stopFlag && !stoppedBySkill)
         {
            increaseMP(getMaxMP()*Time.deltaTime * (10 / getSkillCD()));
+            reSpawnTimer += Time.deltaTime;
+            if (reSpawnTimer > reSpawnTime)
+            {
+                respawn();
+            }
         }
+
+        // TODO - unused??
         if (isSpeedDebuffing)
         {
             speedDebuffTimer += Time.deltaTime;
@@ -92,18 +100,23 @@ public class Car : MonoBehaviour
             {
                 removeSpeedDebuff();
             }
-
         }
+
+        limitAngleAndVelocity();
+    }
+
+    private void limitAngleAndVelocity()
+    {
         carVelocity = GetComponent<Rigidbody>().velocity.magnitude;
         if (transform.rotation.eulerAngles.x > 180)
         {
             transform.rotation = Quaternion.Euler(
-                 Mathf.Clamp(transform.rotation.eulerAngles.x, 360- maxTiltAngle, 360),
+                 Mathf.Clamp(transform.rotation.eulerAngles.x, 360 - maxTiltAngle, 360),
                  transform.rotation.eulerAngles.y,
                  transform.rotation.eulerAngles.z
                  );
         }
-        else if (transform.rotation.eulerAngles.x <180)
+        else if (transform.rotation.eulerAngles.x < 180)
         {
             transform.rotation = Quaternion.Euler(
                  Mathf.Clamp(transform.rotation.eulerAngles.x, 0, maxTiltAngle),
@@ -117,7 +130,7 @@ public class Car : MonoBehaviour
             transform.rotation = Quaternion.Euler(
                  transform.rotation.eulerAngles.x,
                  transform.rotation.eulerAngles.y,
-                 Mathf.Clamp(transform.rotation.eulerAngles.z, 360- maxTiltAngle, 360)
+                 Mathf.Clamp(transform.rotation.eulerAngles.z, 360 - maxTiltAngle, 360)
                  );
         }
         else if (transform.rotation.eulerAngles.z < 180)
@@ -129,12 +142,7 @@ public class Car : MonoBehaviour
                  );
         }
 
-        if (speedText != null)
-        {
-            speedText.text = Mathf.Round((rb.velocity.magnitude * 3600 / 1000) * 10) / 10f + " km/h";
-        }
-
-        if (rb.velocity.magnitude > status.topSpeed*status.topSpeedModifier)
+        if (rb.velocity.magnitude > status.topSpeed * status.topSpeedModifier)
         {
             float slowDownRatio = rb.velocity.magnitude / (status.topSpeed * status.topSpeedModifier);
             rb.velocity /= slowDownRatio;
@@ -175,13 +183,15 @@ public class Car : MonoBehaviour
         rrController.ApplyBrake(maxBrakeTorque* brakeFactor);
     }
 
-    public void useSkill()
+    public bool useSkill()
     {
-        if (status.currMP == status.maxMP)
+        if (status.currMP == status.maxMP && !stoppedBySkill)
         {
             mySkill.activateSkill();
             status.currMP = 0;
+            return true;
         }
+        return false;
     }
 
     public void stopBySkill(bool flag)
@@ -303,8 +313,8 @@ public class Car : MonoBehaviour
         {
             foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
             {
-                rb.drag = 0;
-                rb.angularDrag = 0.05f;
+                rb.drag = RUNNING_DRAG;
+                rb.angularDrag = RUNNING_ANGULAR_DRAG;
             }
 
             enableAllController();
@@ -419,5 +429,46 @@ public class Car : MonoBehaviour
         speedDebuffTimer = 0;
     }
 
+    private void respawn()
+    {
+        CarCheckPoint respawnPoint = findCheckPoint(respawnPositionIdx);
+        Vector3 pos = new Vector3(
+            respawnPoint.transform.position.x,
+            respawnPoint.transform.position.y -
+            respawnPoint.transform.localScale.y/2 + 1,
+            respawnPoint.transform.position.z
+            );
+        Quaternion rot = respawnPoint.transform.rotation;
+        
+        transform.position = pos;
+        transform.rotation = rot;
+        reSpawnTimer = 0;
+    }
+
+    public void setRespawnIdx(int idx)
+    {
+        if (idx > respawnPositionIdx)
+        {
+            respawnPositionIdx = idx;
+            reSpawnTimer = 0;
+        }
+    }
+
+    private CarCheckPoint findCheckPoint(int dist)
+    {
+        CarCheckPoint[] checkpoints = FindObjectsOfType<CarCheckPoint>();
+        dist = Mathf.Clamp(dist,0, checkpoints.Length-1); 
+        foreach (CarCheckPoint point in checkpoints)
+        {
+            if (point.dist == dist)
+            {
+                Debug.Log("there are " + checkpoints.Length + "points; respawned at " + point.name);
+                return point;
+            }
+        }
+
+        Debug.Log("Error in  findCheckPoint("+ dist + ")");
+        return checkpoints[0];
+    }
 
 }

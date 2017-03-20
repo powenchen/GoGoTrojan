@@ -38,8 +38,10 @@ public class moveBtnOnClick : MonoBehaviour {
 
 	public void moveButtonOnClick () {
         
-		MoveBtnText.text = "";
-        car.useSkill();
+        if (car.useSkill())
+        {
+            MoveBtnText.text = "";
+        }
 
 	}
 
