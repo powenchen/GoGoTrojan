@@ -38,15 +38,32 @@ public class StaticVariables : MonoBehaviour {
         return saveData.GetField("characters").list[charID];
     }
 
+    public static JSONObject GetCardStatus(int cardID)
+    {
+        // return the Character data json object based on character id and savedata
+        return saveData.GetField("cards").list[cardID];
+    }
+
     public static int GetTotalCoins()
     {
         // return TotalCoins number
-        return (int)(saveData.GetField("TotalCoins").n);
+        return (int)(saveData.GetField("totalCoins").n);
     }
 
     public static void SetTotalCoins(int totalNum)
     {
         // set TotalCoins number
-        saveData.SetField("TotalCoins", totalNum);
+        saveData.SetField("totalCoins", totalNum);
+    }
+    public static int GetProgress()
+    {
+        // return TotalCoins number
+        return (int)(saveData.GetField("progress").n);
+    }
+
+    public static void SetProgress(int progress)
+    {
+        // set TotalCoins number
+        saveData.SetField("progress", progress);
     }
 }
