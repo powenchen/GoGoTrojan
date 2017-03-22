@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class Glue : MonoBehaviour {
+public class Glue : TrapWeapons
+{
 
 	private bool alreadyPut;
 
-	// Use this for initialization
-	void Start () {
+    private float damageValue = 0;
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -25,7 +26,8 @@ public class Glue : MonoBehaviour {
             {
                 return;
             }
-            other.GetComponent<Car>().speedDebuff();
+            other.GetComponent<CarStatus>().isAttackedBy(attacker, damageValue);
+            other.GetComponent<CarStatus>().speedDebuff();
             Destroy(gameObject);
         }
 

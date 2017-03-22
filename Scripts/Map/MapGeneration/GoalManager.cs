@@ -23,7 +23,7 @@ public class GoalManager : MonoBehaviour {
             }
             return;
         }
-        if (FindObjectOfType<PlayerController>().GetComponent<Car>().getHP() == 0)
+        if (FindObjectOfType<PlayerController>() == null)
         {
             statImage.isWin = false;
             isOver = true;

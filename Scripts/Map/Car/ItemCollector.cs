@@ -98,22 +98,25 @@ public class ItemCollector : MonoBehaviour {
     {
         if (itemIdx != -1)
         {
+            CarStatus attacker = GetComponent<CarStatus>();
             if (itemIdx == 0)// missile is a special case
             {
                 Vector3 spawnPosition = transform.position + 2 * transform.forward * itemPutOffset;
                 Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y, 0));
-                Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, transform);
+                GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, transform);
+                weapon.GetComponent<TrapWeapons>().attacker = attacker;
             }
             else if (itemIdx == 4) // lightning is a special case
             {
-                foreach (Car car in FindObjectsOfType<Car>())
+                foreach (CarStatus car in FindObjectsOfType<CarStatus>())
                 {
-                    if (!car.Equals(GetComponent<Car>()))
+                    
+                    if (!car.Equals(attacker))
                     {
                         Vector3 spawnPosition = car.transform.position;
                         Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                        Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, car.transform);
-                        car.decreaseHP(lightningDamage);
+                        GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, car.transform);
+                        weapon.GetComponent<TrapWeapons>().attacker = attacker;
                     }
                 }
             }
@@ -121,8 +124,11 @@ public class ItemCollector : MonoBehaviour {
             {
                 Vector3 spawnPosition = transform.position - transform.forward * itemPutOffset;
                 Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation);
+                GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation);
+                weapon.GetComponent<TrapWeapons>().attacker = attacker;
             }
+
+            //reset item idx after using
             itemIdx = -1;
 
         }

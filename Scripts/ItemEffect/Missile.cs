@@ -1,14 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class Missile : MonoBehaviour {
+public class Missile : TrapWeapons
+{
 
 	public float speed;  // default value = 70
 
-	public float damageValue; // default value = 50
+    private float damageValue = 50;
 
-	public GameObject explosion;
+    public GameObject explosion;
 
     
 //	private bool alreadyPut = false;
@@ -36,12 +36,12 @@ public class Missile : MonoBehaviour {
             {
                 return;
             }
-            Debug.Log("before missile HP = " + other.GetComponent<Car>().getHP());
+            Debug.Log("before missile HP = " + other.GetComponent<CarStatus>().getHP());
             Instantiate(explosion, other.transform.position, other.transform.rotation);
 
-            other.GetComponent<Car>().decreaseHP(damageValue);
+            other.GetComponent<CarStatus>().isAttackedBy(attacker, damageValue);
 
-            Debug.Log("after missile HP = " + other.GetComponent<Car>().getHP());
+            Debug.Log("after missile HP = " + other.GetComponent<CarStatus>().getHP());
             Destroy(gameObject);
         }
         

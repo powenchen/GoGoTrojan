@@ -8,18 +8,20 @@ public class moveBtnOnClick : MonoBehaviour {
 	public Button MoveBtn;
 	public Text MoveBtnText;
     public Car car;
+    public CarStatus carStatus;
 
 
-	// Use this for initialization
-	void Start () {
-		if (MoveBtnText != null) {
+    // Use this for initialization
+    void Awake () {
+
+        if (MoveBtnText != null) {
             MoveBtnText.text = "";
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        if (car.getMP() == car.getMaxMP())
+        if (carStatus.getMP() == carStatus.getMaxMP())
         {
             if (car.GetComponent<N2OSkill>() != null)
             {
@@ -48,5 +50,6 @@ public class moveBtnOnClick : MonoBehaviour {
     public void setPlayerCar(Car c)
     {
         car = c;
+        carStatus = c.GetComponent<CarStatus>();
     }
 }

@@ -92,12 +92,12 @@ public class MapGen : MonoBehaviour
         hp = 100;
         mp = 100;
         atk = 100;
-        skillCD = 50;
+        skillCD = 1;
         speed = 80;
         initCharacter(StaticVariables.mapID, id, hp,mp, atk, speed, skillCD,0, true);
 
-        initCharacter(StaticVariables.mapID, Random.Range(0, 3), 100, 100, 100,150,50, 1, false);
-        //initCharacter(PlayerPrefs.GetInt("CourseID"), Random.Range(0, 3), 100, 100, 100, 2, false);
+        initCharacter(StaticVariables.mapID, Random.Range(0, 3), 100, 100, 100, 150, 5, 1, false);
+        initCharacter(StaticVariables.mapID, Random.Range(0, 3), 100, 100, 100, 150, 5, 2, false);
 
 
         //there are carinitDebug.Length cars; init them in time stop skill users' enemy lists 
@@ -195,14 +195,15 @@ public class MapGen : MonoBehaviour
         PathManager path = courseList[courseID].getPath();
 
         Car car = Instantiate(characterList[charID], position, rotation).GetComponent<Car>();
+        CarStatus carStatus = car.GetComponent<CarStatus>();
         MiniMapMark mark = Instantiate(miniMarkList[charID], position, rotation).GetComponent<MiniMapMark>();
 
         //init car params
-        car.attackInitialize(attackPower);
-        car.HPInitialize(maxHP);
-        car.MPInitialize(maxMP);
-        car.skillCDInitialize(skillCD);
-        car.setTopSpeed(basicTopSpeed * (1+(speed / 1000f)));//speed = 100pt = 1.1times
+        carStatus.attackInitialize(attackPower);
+        carStatus.HPInitialize(maxHP);
+        carStatus.MPInitialize(maxMP);
+        carStatus.skillCDInitialize(skillCD);
+        carStatus.setTopSpeed(basicTopSpeed * (1+(speed / 1000f)));//speed = 100pt = 1.1times
 
         mark.transform.parent = miniMap.transform;
         marks[racerNum] = mark;

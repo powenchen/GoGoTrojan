@@ -18,7 +18,6 @@ public class Car : MonoBehaviour
     
     private Rigidbody rb;
     private WheelController flController, frController, rlController, rrController;
-    public ParticleSystem AIExplosionOnDead;
 
     private float maxTiltAngle = 20;
 
@@ -36,13 +35,11 @@ public class Car : MonoBehaviour
     private CarStatus status;
 
     // indicate whether the car is stopping
-    private bool stopFlag = false;
+    public bool stopFlag = false;
     // indicate whether the car is stopped by others
-    private bool stoppedBySkill = false;
+    public bool stoppedBySkill = false;
 
-    private float speedDebuffTime = 2;
-    private bool isSpeedDebuffing = false;
-    private float speedDebuffTimer = 0;
+
 
     private int respawnPositionIdx = -1;
     private float reSpawnTime = 5;
@@ -72,19 +69,9 @@ public class Car : MonoBehaviour
     // Update is called once per frame 
     void Update()
     {
-        if(GetComponent<AIScript>() !=null)
-        {
-            // destroy ai car
-            if (getHP() == 0)
-            {
-                Instantiate(AIExplosionOnDead, transform.position, transform.rotation);
-                Destroy(gameObject);
-            }
-
-        }
+        
         if (!stopFlag && !stoppedBySkill)
         {
-           increaseMP(getMaxMP()*Time.deltaTime * (10 / getSkillCD()));
             reSpawnTimer += Time.deltaTime;
             if (reSpawnTimer > reSpawnTime)
             {
@@ -92,15 +79,7 @@ public class Car : MonoBehaviour
             }
         }
 
-        // TODO - unused??
-        if (isSpeedDebuffing)
-        {
-            speedDebuffTimer += Time.deltaTime;
-            if (speedDebuffTimer >= speedDebuffTime)
-            {
-                removeSpeedDebuff();
-            }
-        }
+
 
         limitAngleAndVelocity();
     }
@@ -230,10 +209,7 @@ public class Car : MonoBehaviour
         return source;
     }
 
-    public void setTopSpeed(float speed)
-    {
-        status.topSpeed = speed;
-    }
+    
 
     public float getTopSpeed()
     {
@@ -324,110 +300,16 @@ public class Car : MonoBehaviour
 
     
 
-    public void HPInitialize(float point)
-    {
-        status.maxHP = status.currHP = point;
-    }
+    
 
-    public float getMaxHP()
-    {
-        return status.maxHP;
-    }
+    
 
-    public float getHP()
-    {
-        return status.currHP;
-    }
+    
 
-    public void decreaseHP(float point)
-    {
-        status.currHP = Mathf.Clamp(status.currHP - point, 0 , status.maxHP);
-    }
-
-    public void increaseHP(float point)
-    {
-        status.currHP = Mathf.Clamp(status.currHP + point, 0, status.maxHP);
-    }
-
-    public void MPInitialize(float maxPoint, float point = 0)
-    {
-        status.maxMP = maxPoint;
-        status.currMP = point;
-    }
-
-    public float getMaxMP()
-    {
-        return status.maxMP;
-    }
-
-    public float getMP()
-    {
-        return status.currMP;
-    }
-
-    public void decreaseMP(float point)
-    {
-        status.currMP = Mathf.Clamp(status.currMP - point, 0, status.maxMP);
-    }
-
-    public void increaseMP(float point)
-    {
-        status.currMP = Mathf.Clamp(status.currMP + point, 0, status.maxMP);
-    }
-    public void attackInitialize(float point)
-    {
-        status.attackPower = point;
-    }
-
-    public float getAttackPower()
-    {
-        return status.attackPower;
-    }
-
-    public void decreaseAttackPower(float point)
-    {
-        status.attackPower = Mathf.Max(status.attackPower - point, 0);
-    }
-
-    public void increaseAttackPower(float point)
-    {
-        status.attackPower = Mathf.Max(status.attackPower + point, 0);
-    }
-
-    public void skillCDInitialize(float point)
-    {
-        status.skillCD = point;
-    }
-
-    public float getSkillCD()
-    {
-        return status.skillCD;
-    }
-
-    public void decreaseSkillCD(float point)
-    {
-        status.skillCD = Mathf.Max(status.skillCD - point, 0.1f);
-    }
-
-    public void increaseSkillCD(float point)
-    {
-        status.skillCD += point; 
-    }
+    
 
 
-    public void speedDebuff()
-    {
-        status.topSpeedModifier = 0.5f;
-        isSpeedDebuffing = true;
-        speedDebuffTimer = 0;
-    }
 
-    public void removeSpeedDebuff()
-    {
-        status.topSpeedModifier = 1;
-        isSpeedDebuffing = false;
-        speedDebuffTimer = 0;
-    }
 
     private void respawn()
     {

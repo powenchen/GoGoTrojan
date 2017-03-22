@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LandMine : MonoBehaviour {
+public class LandMine : TrapWeapons { 
 
 	public GameObject explosion;
 
-	public float damageValue; // default value = 30
+    private float damageValue = 30;
 
-	private bool alreadyPut;
+    private bool alreadyPut;
 
 
 	// Use this for initialization
@@ -32,7 +32,7 @@ public class LandMine : MonoBehaviour {
             }
             Instantiate(explosion, other.transform.position, other.transform.rotation);
 
-            other.GetComponent<Car>().decreaseHP(damageValue);
+            other.GetComponent<CarStatus>().isAttackedBy(attacker,damageValue);
             Destroy(gameObject);
         }
         

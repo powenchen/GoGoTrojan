@@ -14,6 +14,11 @@ public class StaticVariables : MonoBehaviour {
     public static int carID = 0;
     public static JSONObject saveData = null;
 
+    //unchanged data, initialize in the beginning
+    public static JSONObject cardData = null;
+    public static JSONObject carData = null;
+    public static JSONObject characterData = null;
+
     public static void ResetVariables()
     {
         //reset everything for one 'run'
@@ -38,10 +43,32 @@ public class StaticVariables : MonoBehaviour {
         return saveData.GetField("characters").list[charID];
     }
 
-    public static JSONObject GetCardStatus(int cardID)
+    public static JSONObject GetCardStatus(string attribute,int cardId)
     {
-        // return the Character data json object based on character id and savedata
-        return saveData.GetField("cards").list[cardID];
+        // return the card data json object based on its attribute and serial # in the list
+        return saveData.GetField("cards").GetField(attribute).list[cardId];
+    }
+
+    //call this function when purchasing a card
+    public static void AddCard(string attribute, int cardId)
+    {
+        saveData.GetField("cards").GetField(attribute).Add(new JSONObject("{\"id\":"
+            +cardId+",\"equipped\":-1\"price\":"
+            +cardData.GetField("cards").list[cardId].GetField("price").n +"}"));
+    }
+
+    //call this function when selling a card
+    public static void RemoveCard(string attribute, int cardNumber)
+    {
+        // remove the card data json object based on its attribute and serial # in the list
+        saveData.GetField("cards").GetField(attribute).list.RemoveAt(cardNumber);
+    }
+    
+    //call this function when selling a card
+    public static void RemoveCard(string attribute, JSONObject cardObj)
+    {
+        // remove the card data json object based on its attribute in the list
+        saveData.GetField("cards").GetField(attribute).list.Remove(cardObj);
     }
 
     public static int GetTotalCoins()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//unused code- obsolete
 public class slowDown : MonoBehaviour {
     public float slowDownRatio = 2;
 	// Use this for initialization
@@ -19,14 +20,8 @@ public class slowDown : MonoBehaviour {
        // Debug.Log("triggered!!! tag = "+other.tag);
         if (other.CompareTag("Enemy") || other.CompareTag("Player")) // todo
         {
-            other.transform.root.GetComponent<Car>().speedDebuff();
+            other.transform.root.GetComponent<CarStatus>().speedDebuff();
         }
     }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Enemy") || other.CompareTag("Player"))
-        {
-        }
-    }
 }

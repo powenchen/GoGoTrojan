@@ -21,14 +21,14 @@ public class rankingSystem : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        rankingText.text = getMyRank().ToString() +  "/" + totalCarNum.ToString();
+        rankingText.text = Mathf.Clamp(getMyRank(),1, totalCarNum).ToString() +  "/" + totalCarNum.ToString();
     }
 
 	public int getMyRank() {
         int myDist = 0;
 
         Car[] cars = FindObjectsOfType<Car>();
-        totalCarNum = cars.Length;
+        totalCarNum = FindObjectsOfType<AIScript>().Length + 1; //self + rest ai
         foreach (Car car in cars)
         {
             if (car.GetComponent<PlayerController>() != null)

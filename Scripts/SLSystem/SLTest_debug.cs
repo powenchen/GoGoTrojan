@@ -38,7 +38,7 @@ public class SLTest_debug : MonoBehaviour
         }
         //sample code
 		JSONObject charData = StaticVariables.GetCharacterStatus(0);
-		Debug.Log(charData.GetField("MaxMP"));
+		Debug.Log(charData.GetField("MaxMP").n);
 		charData.SetField("MaxMP", charData.GetField("MaxMP").n + 10);
         charData.SetField("MaxHP", charData.GetField("MaxHP").n + 15);
 
