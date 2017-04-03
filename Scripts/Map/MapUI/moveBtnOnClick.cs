@@ -39,6 +39,10 @@ public class moveBtnOnClick : MonoBehaviour {
             {
                 MoveBtnText.text = "DRAGON'S BREATH";
             }
+            if (car.GetComponent<SpearSkill>() != null)
+            {
+                MoveBtnText.text = "ACHILLES";
+            }
         }
         else {
 

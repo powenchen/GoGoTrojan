@@ -75,7 +75,7 @@ public class MapGen : MonoBehaviour
         skillCD = 1;
         speed = 120;
         defense = 100;
-        StaticVariables.characterID = 3;
+        StaticVariables.characterID = 4;
         /***** TODO - For debug *****/
 
         initCharacter(StaticVariables.mapID, StaticVariables.carID, StaticVariables.characterID, hp,mp, atk,defense, speed, skillCD,0, true);
@@ -197,6 +197,10 @@ public class MapGen : MonoBehaviour
         if (charID != 3)
         {
             DestroyImmediate(car.GetComponent<FlameSkill>());
+        }
+        if (charID != 4)
+        {
+            DestroyImmediate(car.GetComponent<SpearSkill>());
         }
 
         //init car params

@@ -86,6 +86,8 @@ public class RankingSystem : MonoBehaviour {
         return carRank;
     }
 
+    
+
     public Car GetFirstPlaceCar(Car exception = null)//skip exception
     {
         int dist = -1;
