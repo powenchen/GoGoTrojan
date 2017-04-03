@@ -18,6 +18,7 @@ public class StaticVariables : MonoBehaviour {
     public static JSONObject cardData = null;
     public static JSONObject carData = null;
     public static JSONObject characterData = null;
+    public static JSONObject itemData = null;
 
     public static void ResetVariables()
     {

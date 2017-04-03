@@ -31,6 +31,14 @@ public class moveBtnOnClick : MonoBehaviour {
             {
                 MoveBtnText.text = "TIME";
             }
+            if (car.GetComponent<CoinAttackSkill>() != null)
+            {
+                MoveBtnText.text = "CASH CHUCKER";
+            }
+            if (car.GetComponent<FlameSkill>() != null)
+            {
+                MoveBtnText.text = "DRAGON'S BREATH";
+            }
         }
         else {
 

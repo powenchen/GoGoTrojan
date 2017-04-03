@@ -7,6 +7,7 @@ public class Skill : MonoBehaviour {
 
     public AudioClip skillAudio;
     protected AudioSource skillSound;
+    public bool isSkillUsing;
         
     public virtual void activateSkill()
     {

@@ -49,7 +49,7 @@ public class MapGen : MonoBehaviour
             for (int i = 0; i < carinitDebug.Length; ++i)
             {
                
-                initCharacter(courseinitDebug, carinitDebug[i], maxHPDebug, maxMPDebug, maxATKDebug,100,100, i, (i == 0));
+                initCharacter(courseinitDebug, carinitDebug[i], carinitDebug[i], maxHPDebug, maxMPDebug, maxATKDebug,100,100,100, i, (i == 0));
             }
             initTimeStopskillUsers();
 
@@ -63,41 +63,25 @@ public class MapGen : MonoBehaviour
         StaticVariables.ResetVariables();
         skyBoxIdx = StaticVariables.mapID;//PlayerPrefs.GetInt("CourseID");
         setCourse(StaticVariables.mapID);
-
-        int id = StaticVariables.characterID + 2 * StaticVariables.carID;
+        
             //PlayerPrefs.GetInt("PlayerID") + 2 * PlayerPrefs.GetInt("CarID");//TODO - modify this
         //PlayerPrefs.SetInt("Coins", 0);
-        float hp;
-        float mp;
-        float atk;
-        float skillCD;
-        float speed;
-        if (PlayerPrefs.GetInt("PlayerID") == 0)
-        {
-            hp = PlayerPrefs.GetFloat("Player1_Health");
-            atk = PlayerPrefs.GetFloat("Player1_Power");
-            speed = PlayerPrefs.GetFloat("Player1_Speed");
-            skillCD = PlayerPrefs.GetFloat("Player1_SkillCDR");
-            mp = PlayerPrefs.GetFloat("Player1_Mana");
+        float hp, mp, atk, skillCD, speed,defense;
 
-        }
-        else
-        {
-            hp = PlayerPrefs.GetFloat("Player2_Health");
-            atk = PlayerPrefs.GetFloat("Player2_Power");
-            speed = PlayerPrefs.GetFloat("Player2_Speed");
-            skillCD = PlayerPrefs.GetFloat("Player2_SkillCDR");
-            mp = PlayerPrefs.GetFloat("Player2_Mana");
-        }
+        /***** TODO - For debug *****/
         hp = 100;
         mp = 100;
         atk = 100;
         skillCD = 1;
-        speed = 80;
-        initCharacter(StaticVariables.mapID, id, hp,mp, atk, speed, skillCD,0, true);
+        speed = 120;
+        defense = 100;
+        StaticVariables.characterID = 3;
+        /***** TODO - For debug *****/
 
-        initCharacter(StaticVariables.mapID, Random.Range(0, 3), 100, 100, 100, 150, 5, 1, false);
-        initCharacter(StaticVariables.mapID, Random.Range(0, 3), 100, 100, 100, 150, 5, 2, false);
+        initCharacter(StaticVariables.mapID, StaticVariables.carID, StaticVariables.characterID, hp,mp, atk,defense, speed, skillCD,0, true);
+
+        initCharacter(StaticVariables.mapID,2, 1, 100, 100, 100,50, 150, 5, 1, false);
+        initCharacter(StaticVariables.mapID,3, 0, 100, 100, 100,50, 150, 5, 2, false);
 
 
         //there are carinitDebug.Length cars; init them in time stop skill users' enemy lists 
@@ -187,16 +171,33 @@ public class MapGen : MonoBehaviour
         }
     }
 
-    public void initCharacter(int courseID ,int charID, float maxHP, float maxMP, float attackPower,float speed, float skillCD, int racerNum, bool isPlayer = false)
+    public void initCharacter(int courseID , int carId,int charID, float maxHP, float maxMP, float attackPower,float defense,float speed, float skillCD, int racerNum, bool isPlayer = false)
     {
-        Debug.Log("generating char = " + charID);
+        Debug.Log("generating char = " + carId);
         Vector3 position = courseList[courseID].getStartPositions()[racerNum + 1];
         Quaternion rotation = Quaternion.Euler(0, courseList[courseID].getStartRotation().eulerAngles.y, 0);
         PathManager path = courseList[courseID].getPath();
 
-        Car car = Instantiate(characterList[charID], position, rotation).GetComponent<Car>();
+        Car car = Instantiate(characterList[carId], position, rotation).GetComponent<Car>();
         CarStatus carStatus = car.GetComponent<CarStatus>();
-        MiniMapMark mark = Instantiate(miniMarkList[charID], position, rotation).GetComponent<MiniMapMark>();
+        MiniMapMark mark = Instantiate(miniMarkList[carId], position, rotation).GetComponent<MiniMapMark>();
+
+        if (charID != 0)
+        {
+            DestroyImmediate(car.GetComponent<N2OSkill>());
+        }
+        if (charID != 1)
+        {
+            DestroyImmediate(car.GetComponent<TimeStopSkill>());
+        }
+        if (charID != 2)
+        {
+            DestroyImmediate(car.GetComponent<CoinAttackSkill>());
+        }
+        if (charID != 3)
+        {
+            DestroyImmediate(car.GetComponent<FlameSkill>());
+        }
 
         //init car params
         carStatus.attackInitialize(attackPower);
@@ -204,6 +205,7 @@ public class MapGen : MonoBehaviour
         carStatus.MPInitialize(maxMP);
         carStatus.skillCDInitialize(skillCD);
         carStatus.setTopSpeed(basicTopSpeed * (1+(speed / 1000f)));//speed = 100pt = 1.1times
+        carStatus.defenseBase = defense;
 
         mark.transform.parent = miniMap.transform;
         marks[racerNum] = mark;

@@ -6,11 +6,11 @@ public class Car : MonoBehaviour
 {
     public const float FREEZE_DRAG = 100000;
     public const float RUNNING_DRAG = 0;
-    public const float RUNNING_ANGULAR_DRAG = 10;
+    public const float RUNNING_ANGULAR_DRAG = 5;
     private Vector3 com = new Vector3(0,0,0);
     private float maxMotorTorque = 10000;
-    private float maxBrakeTorque = 30000;
-    private float maxSteerAngle = 15;
+    private float maxBrakeTorque = 20000;
+    private float maxSteerAngle = 20;
     public GameObject frontLeft, frontRight, rearLeft, rearRight;
     //public float topSpeed = 100 * 1000 / 3600;//(100 km/h)
     public float carVelocity;
@@ -38,17 +38,15 @@ public class Car : MonoBehaviour
     public bool stopFlag = false;
     // indicate whether the car is stopped by others
     public bool stoppedBySkill = false;
+    public bool stunned = false;
 
-
-
-    private int respawnPositionIdx = -1;
+    public int respawnPositionIdx = -1;
     private float reSpawnTime = 5;
     private float reSpawnTimer = 0;
 
     private void Awake()
     {
         status = GetComponent<CarStatus>();
-        mySkill = GetComponent<Skill>();
 
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = com;
@@ -69,7 +67,13 @@ public class Car : MonoBehaviour
     // Update is called once per frame 
     void Update()
     {
-        
+        // slow down in a turn
+        float decclerationThres = 0.3f;
+        if (Mathf.Abs(frontLeft.GetComponent<WheelCollider>().steerAngle) > decclerationThres * maxSteerAngle || Mathf.Abs(frontRight.GetComponent<WheelCollider>().steerAngle) > decclerationThres * maxSteerAngle)
+        {
+            float deccelerationRatio = 1.2f*Mathf.Max(Mathf.Abs(frontLeft.GetComponent<WheelCollider>().steerAngle), Mathf.Abs(frontRight.GetComponent<WheelCollider>().steerAngle)) / maxSteerAngle;
+            status.decreaseTopSpeedModifier(deccelerationRatio);
+        }
         if (!stopFlag && !stoppedBySkill)
         {
             reSpawnTimer += Time.deltaTime;
@@ -82,6 +86,13 @@ public class Car : MonoBehaviour
 
 
         limitAngleAndVelocity();
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        //Debug.Log("OnCollisionStay is called");
+        status.decreaseTopSpeedModifier(1.5f);
+
     }
 
     private void limitAngleAndVelocity()
@@ -121,17 +132,23 @@ public class Car : MonoBehaviour
                  );
         }
 
-        if (rb.velocity.magnitude > status.topSpeed * status.topSpeedModifier)
+        if (rb.velocity.magnitude > status.getSpeed())
         {
-            float slowDownRatio = rb.velocity.magnitude / (status.topSpeed * status.topSpeedModifier);
+            //Debug.Log("slow down to v = " + status.getSpeed());
+            float slowDownRatio = rb.velocity.magnitude / (status.getSpeed());
             rb.velocity /= slowDownRatio;
         }
     }
 
     void FixedUpdate()
     {
-        //Debug.Log("static flags = (" + StaticVariables.gameStarts + "," + StaticVariables.gameIsOver + ")");
-        if (!StaticVariables.gameStarts || StaticVariables.gameIsOver || stoppedBySkill)
+        if (!StaticVariables.gameStarts)
+        {
+            status.currMP = 0;
+            status.currHP = status.getMaxHP();
+        }
+        //Debug.Log("static flags = (" + StaticVariables.gameStarts + "," + StaticVariables.gameIsOver +","+ stoppedBySkill + ")");
+        if (!StaticVariables.gameStarts || StaticVariables.gameIsOver || stoppedBySkill || stunned)
         {
             stopRunning();
             return;
@@ -164,7 +181,14 @@ public class Car : MonoBehaviour
 
     public bool useSkill()
     {
-        if (status.currMP == status.maxMP && !stoppedBySkill)
+        if (!mySkill)
+        {
+            mySkill = GetComponent<Skill>();
+            if (!mySkill)
+                Debug.Log(name + " does not have a skill");
+        }
+        //TODO - modify this
+        if (status.currMP == status.getMaxMP() && !stoppedBySkill && !stunned && !mySkill.isSkillUsing)
         {
             mySkill.activateSkill();
             status.currMP = 0;
@@ -188,6 +212,12 @@ public class Car : MonoBehaviour
     public void ApplySteer(float steerFactor)
     {
         float steerAngle = steerFactor * maxSteerAngle;
+        /*
+        if (Mathf.Abs(steerFactor) > 0.75f)
+        {
+            //apply brake in big curve
+            ApplyBrake(Mathf.Clamp(steerFactor,-1,1));
+        }*/
         flController.ApplySteer(steerAngle);
         frController.ApplySteer(steerAngle);
         
@@ -213,7 +243,7 @@ public class Car : MonoBehaviour
 
     public float getTopSpeed()
     {
-        return status.topSpeed;
+        return status.getSpeed();
     }
 
     private void diasbleAllController()
@@ -279,13 +309,21 @@ public class Car : MonoBehaviour
 
             stopFlag = true;
 
-            mySkill.stopSkill();
+            if (!mySkill)
+            {
+                mySkill = GetComponent<Skill>();
+                
+            }
+            if (!mySkill)
+                Debug.Log(name + " does not have a skill");
+            else
+                mySkill.stopSkill();
         }
     }
 
     public void startRunning()
     {
-        if (stopFlag)
+        if (!stunned)
         {
             foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>())
             {
@@ -296,30 +334,41 @@ public class Car : MonoBehaviour
             enableAllController();
             stopFlag = false;
         }
+
     }
-
     
-
-    
-
-    
-
-    
-
-    
-
-
-
 
     private void respawn()
     {
         CarCheckPoint respawnPoint = findCheckPoint(respawnPositionIdx);
-        Vector3 pos = new Vector3(
+        if (respawnPoint == null)
+        {
+            return;
+        }
+        Vector3 posCenter = new Vector3(
             respawnPoint.transform.position.x,
             respawnPoint.transform.position.y -
             respawnPoint.transform.localScale.y/2 + 1,
             respawnPoint.transform.position.z
             );
+        Vector3 posLeft = posCenter - respawnPoint.transform.right * 5f;
+        Vector3 posRight = posCenter + respawnPoint.transform.right * 5f;
+        Vector3 pos = posCenter;
+        foreach (Car car in FindObjectsOfType<Car>())
+        {
+            if ((car.transform.position - pos).magnitude < 2.5f)
+            {
+                pos = posLeft;
+                foreach (Car car1 in FindObjectsOfType<Car>())
+                {
+                    if ((car1.transform.position - posLeft).magnitude < 2.5f)
+                    {
+                        pos = posRight;
+                    }
+                }
+                break;
+            }
+        }
         Quaternion rot = respawnPoint.transform.rotation;
         
         transform.position = pos;
@@ -339,6 +388,10 @@ public class Car : MonoBehaviour
     private CarCheckPoint findCheckPoint(int dist)
     {
         CarCheckPoint[] checkpoints = FindObjectsOfType<CarCheckPoint>();
+        if (checkpoints.Length == 0)
+        {
+            return null;
+        }
         dist = Mathf.Clamp(dist,0, checkpoints.Length-1); 
         foreach (CarCheckPoint point in checkpoints)
         {

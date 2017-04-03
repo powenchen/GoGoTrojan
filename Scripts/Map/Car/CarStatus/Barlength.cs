@@ -16,7 +16,8 @@ public class Barlength : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        float width = 2;
+        float maxWidth = 2;
+        float width = maxWidth;
         if (car != null)
         {
             if (isHPBar)
@@ -28,6 +29,7 @@ public class Barlength : MonoBehaviour {
                 width *= (carStatus.getMP() / carStatus.getMaxMP());
             }
         }
+        width = Mathf.Clamp(width, 0, 2);
         rectTransform.sizeDelta = new Vector2(width, rectTransform.sizeDelta.y);
     }
 

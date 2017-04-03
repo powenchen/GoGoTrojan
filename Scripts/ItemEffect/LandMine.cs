@@ -6,7 +6,7 @@ public class LandMine : TrapWeapons {
 
 	public GameObject explosion;
 
-    private float damageValue = 30;
+    private float damageValue = 1.5f;
 
     private bool alreadyPut;
 
@@ -26,7 +26,7 @@ public class LandMine : TrapWeapons {
         if (other.GetComponent<Car>() != null)
         {
             // timestop mode is invincible
-            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing())
+            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing)
             {
                 return;
             }

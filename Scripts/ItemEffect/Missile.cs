@@ -4,7 +4,7 @@ using UnityEngine;
 public class Missile : TrapWeapons
 {
 
-	public float speed;  // default value = 70
+	private float speed = 120;  
 
     private float damageValue = 50;
 
@@ -32,7 +32,7 @@ public class Missile : TrapWeapons
         {
 
             // timestop mode is invincible
-            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing())
+            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing)
             {
                 return;
             }

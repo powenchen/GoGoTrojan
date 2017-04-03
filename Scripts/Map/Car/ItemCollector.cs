@@ -64,8 +64,8 @@ public class ItemCollector : MonoBehaviour {
             }
             else if (other.GetComponent<Item>() != null)
             {
-                //itemIdx = Random.Range(0, itemLists .Length);
-                int total = 1000;
+                itemIdx = Random.Range(0, itemLists .Length);
+                /*int total = 1000;
                 int rng = Random.Range(0, total);
                 if (rng < 25)
                 {
@@ -85,7 +85,7 @@ public class ItemCollector : MonoBehaviour {
                 }
                 else {
                     itemIdx = 4;
-                }
+                }*/
             }
             Destroy(other.gameObject);
         }
@@ -96,35 +96,44 @@ public class ItemCollector : MonoBehaviour {
 
     public void useItem()
     {
+        Car car = GetComponent<Car>();
+        if (car.stunned || car.stoppedBySkill || car.stopFlag)
+        {
+            // cannot use item when you are stunned, frozen by skill or before game starts 
+            return;
+        }
         if (itemIdx != -1)
         {
             CarStatus attacker = GetComponent<CarStatus>();
             if (itemIdx == 0)// missile is a special case
             {
                 Vector3 spawnPosition = transform.position + 2 * transform.forward * itemPutOffset;
-                Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y, 0));
+                Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y, 90));
                 GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, transform);
                 weapon.GetComponent<TrapWeapons>().attacker = attacker;
+
             }
             else if (itemIdx == 4) // lightning is a special case
             {
-                foreach (CarStatus car in FindObjectsOfType<CarStatus>())
+                foreach (CarStatus status in FindObjectsOfType<CarStatus>())
                 {
                     
-                    if (!car.Equals(attacker))
+                    if (!status.Equals(attacker))
                     {
-                        Vector3 spawnPosition = car.transform.position;
+                        Vector3 spawnPosition = status.transform.position;
                         Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-                        GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, car.transform);
+                        GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation, status.transform);
                         weapon.GetComponent<TrapWeapons>().attacker = attacker;
                     }
                 }
             }
-            else
+            else //traps
             {
-                Vector3 spawnPosition = transform.position - transform.forward * itemPutOffset;
+                Car firstCar = FindObjectOfType<RankingSystem>().GetFirstPlaceCar(GetComponent<Car>());
+                Vector3 spawnPosition = firstCar.transform.position + firstCar.transform.forward * itemPutOffset*5;
                 Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, 0, 0));
                 GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation);
+
                 weapon.GetComponent<TrapWeapons>().attacker = attacker;
             }
 

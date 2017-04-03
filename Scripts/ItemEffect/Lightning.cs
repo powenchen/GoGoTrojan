@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Lightning : TrapWeapons
 {
-    private float lifetime = 3;// destroy in 3 sec
-    private float damageValue = 20;
+    private float lifetime = 2;// destroy in 3 sec
+    public float damageValue = 0.2f;
 	// Use this for initialization
 	void Start () {
         GetComponentInParent<CarStatus>().isAttackedBy(attacker, damageValue);

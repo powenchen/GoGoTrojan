@@ -23,7 +23,7 @@ public class OilSpill : TrapWeapons
         if (other.GetComponent<Car>() != null)
         {
             // timestop mode is invincible
-            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing())
+            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing)
             {
                 return;
             }

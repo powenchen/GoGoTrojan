@@ -9,7 +9,6 @@ public class TimeStopSkill : Skill
 
     private float StopTime = 1;
     public float StopTimerCurr = 0;
-    private bool skillUsing = false;
     private bool isSkillReady = true;
 
     public GameObject[] enemies;
@@ -17,6 +16,7 @@ public class TimeStopSkill : Skill
     
     // Use this for initialization
     void Start () {
+        isSkillUsing = false;
         mainCamera.enabled = false;
         grayScaleScript = backGroundCamera.GetComponent< UnityStandardAssets.ImageEffects.ColorCorrectionRamp> ();
         grayScaleScript.enabled = false;
@@ -25,7 +25,7 @@ public class TimeStopSkill : Skill
 	// Update is called once per frame
 	void Update () {
         //Debug.Log("stop test; position variation = " + Time.fixedDeltaTime * GetComponent<Car>().getTopSpeed() * transform.forward);
-        if (skillUsing)
+        if (isSkillUsing)
         {
             StopTimerCurr += Time.fixedDeltaTime;
             foreach (GameObject enemy in enemies)
@@ -53,10 +53,10 @@ public class TimeStopSkill : Skill
 
     public override void stopSkill()
     {
-        if (skillUsing)
+        if (isSkillUsing)
         {
             isSkillReady = true;
-            skillUsing = false;
+            isSkillUsing = false;
             changeGrayScaleLayer("Default");
             mainCamera.enabled = false;
             grayScaleScript.enabled = false;
@@ -73,10 +73,64 @@ public class TimeStopSkill : Skill
 
     public override void activateSkill()
     {
-        if (isSkillReady && !skillUsing)
+        if (isSkillReady && GetComponent<AIScript>() != null)
+        {
+            CarCheckPoint[] points = FindObjectsOfType<CarCheckPoint>();
+            Vector3 pos = new Vector3();
+            Quaternion spawnRot = new Quaternion() ;
+            int distCurr = FindObjectOfType<RankingSystem>().GetCarDist(GetComponent<Car>());
+            int distNext = Mathf.Min(distCurr + 2, points.Length - 1);
+            foreach (CarCheckPoint point in points)
+            {
+                if (point.dist == distNext)
+                {
+                    Vector3 posCenter = new Vector3(
+                        point.transform.position.x,
+                        point.transform.position.y -
+                        point.transform.localScale.y / 2,
+                        point.transform.position.z
+                    );
+                    Vector3 posLeft = posCenter - point.transform.right * 5f;
+                    Vector3 posRight = posCenter + point.transform.right * 5f;
+                    pos = posCenter;
+
+                    string spawnStr = "center";
+                    foreach (Car car in FindObjectsOfType<Car>())
+                    {
+
+                        Debug.Log("dist from center " + (car.transform.position - posCenter).magnitude);
+                        if ((car.transform.position - posCenter).magnitude < 3f)
+                        {
+                            pos = posLeft;
+                            spawnStr = "left";
+                            foreach (Car car1 in FindObjectsOfType<Car>())
+                            {
+                                if ((car1.transform.position - posLeft).magnitude < 3f)
+                                {
+                                    spawnStr = "right";
+                                    pos = posRight;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    spawnRot = point.transform.rotation;
+                    Debug.Log("orig = "+ distCurr + " spawn to " + point.name +"("+spawnStr+ ") dist = "+ distNext);
+                    break;
+                }
+            }
+
+            
+            transform.position = pos;
+            transform.rotation = spawnRot;
+            //FindObjectOfType<RankingSystem>().SetCarDist(GetComponent<Car>(), distNext);
+            return;
+        }
+        if (isSkillReady && !isSkillUsing)
         {
             isSkillReady = false;
-            skillUsing = true;
+            isSkillUsing = true;
 
             changeGrayScaleLayer("quickSilver");
             mainCamera.enabled = true;
@@ -85,9 +139,5 @@ public class TimeStopSkill : Skill
         }
 
     }
-
-    public bool isSkillUsing()
-    {
-        return skillUsing;
-    }
+    
 }

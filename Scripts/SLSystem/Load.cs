@@ -4,8 +4,22 @@ using UnityEngine;
 using System.IO;
 
 public class Load : MonoBehaviour {
-    public static void loadState(string filePath)
+
+    // hard code these init jsons
+    private static string savedataInit = "";
+    private static string carsInit = "";
+    private static string cardInit = "";
+    private static string characterInit = "";
+    private static string itemInit = "";
+
+    public static void loadState()
     {
+        string filePath = Application.persistentDataPath + "/savedata.json";
+        if (!File.Exists(filePath))
+        {
+            File.WriteAllText(filePath, savedataInit);
+        }
+
         string jsonStr = File.ReadAllText(filePath);
         StaticVariables.saveData = new JSONObject(jsonStr);
         //Debug.Log("Char0 HP = " + StaticVariables.saveData.GetField("characters").list[0].GetField("MaxHP").ToString());
@@ -14,12 +28,39 @@ public class Load : MonoBehaviour {
 
     public static void initialize()
     {
-        string cardStr = File.ReadAllText(Application.persistentDataPath + "/card_data.json");
+        string cardDataPath = Application.persistentDataPath + "/card.json";
+        string carDataPath = Application.persistentDataPath + "/cars.json";
+        string characterDataPath = Application.persistentDataPath + "/character.json";
+        string itemDataPath = Application.persistentDataPath + "/item.json";
+
+        if (!File.Exists(cardDataPath))
+        {
+            File.WriteAllText(cardDataPath, cardInit);
+        }
+        string cardStr = File.ReadAllText(cardDataPath);
         StaticVariables.cardData = new JSONObject(cardStr);
-        string carStr = File.ReadAllText(Application.persistentDataPath + "/car_data.json");
+
+        if (!File.Exists(carDataPath))
+        {
+            File.WriteAllText(carDataPath, carsInit);
+        }
+        string carStr = File.ReadAllText(carDataPath);
         StaticVariables.carData = new JSONObject(carStr);
-        string characterStr = File.ReadAllText(Application.persistentDataPath + "/character_data.json");
+
+        if (!File.Exists(characterDataPath))
+        {
+            File.WriteAllText(characterDataPath, characterInit);
+        }
+        string characterStr = File.ReadAllText(characterDataPath);
         StaticVariables.characterData = new JSONObject(characterStr);
+
+
+        if (!File.Exists(itemDataPath))
+        {
+            File.WriteAllText(itemDataPath, itemInit);
+        }
+        string itemDataStr = File.ReadAllText(itemDataPath);
+        StaticVariables.itemData = new JSONObject(itemDataStr);
         //Debug.Log("Char0 HP = " + StaticVariables.saveData.GetField("characters").list[0].GetField("MaxHP").ToString());
     }
 }

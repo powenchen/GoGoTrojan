@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class rankingSystem : MonoBehaviour {
+public class RankingSystem : MonoBehaviour {
     
 	public Text rankingText;
     private Dictionary<Car, int> carDistMapping = new Dictionary<Car, int>(); // the higher dist -> the higher rank
@@ -14,17 +14,24 @@ public class rankingSystem : MonoBehaviour {
         totalCarNum = cars.Length;
         foreach (Car car in cars)
         {
-            carDistMapping.Add(car, -1);
+            if(!carDistMapping.ContainsKey(car))
+                carDistMapping.Add(car, -1);
         }
 		rankingText.text = "";
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        rankingText.text = Mathf.Clamp(getMyRank(),1, totalCarNum).ToString() +  "/" + totalCarNum.ToString();
+        rankingText.text = Mathf.Clamp(GetMyRank(),1, totalCarNum).ToString() +  "/" + totalCarNum.ToString();
     }
 
-	public int getMyRank() {
+	public int GetMyRank() {
+
+        foreach (Car car in FindObjectsOfType<Car>())
+        {
+            if (!carDistMapping.ContainsKey(car))
+                carDistMapping.Add(car, -1);
+        }
         int myDist = 0;
 
         Car[] cars = FindObjectsOfType<Car>();
@@ -51,10 +58,47 @@ public class rankingSystem : MonoBehaviour {
         return myRank;
     }
 
-    public void setCarDist(Car car, int dist)
+    public void SetCarDist(Car car, int dist)
     {
         carDistMapping[car] = dist;
         car.setRespawnIdx(dist);
+    }
+
+    public int GetCarDist(Car car)
+    {
+        return carDistMapping[car];
+    }
+
+    public int GetCarRanking(Car car)
+    {
+        int carDist = carDistMapping[car];
+
+        Car[] cars = FindObjectsOfType<Car>();
+        int carRank = 1;
+
+        foreach (Car c in cars)
+        {
+            if (carDistMapping[c] >= carDist && !car.Equals(c))
+            {
+                ++carRank;
+            }
+        }
+        return carRank;
+    }
+
+    public Car GetFirstPlaceCar(Car exception = null)//skip exception
+    {
+        int dist = -1;
+        Car ret = null;
+        foreach (Car car in FindObjectsOfType<Car>())
+        {
+            if (carDistMapping[car] > dist && car != exception)
+            {
+                dist = carDistMapping[car];
+                ret = car;
+            }
+        }
+        return ret;
     }
 
 
