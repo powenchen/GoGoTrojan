@@ -282,7 +282,7 @@ public class AIScript : MonoBehaviour {
 
     private bool triggersSensor(Vector3 pos, Vector3 dir, RaycastHit hit, float length)
     {
-        if (Physics.Raycast(pos, dir, out hit, length) && hit.transform.GetComponent<CarCheckPoint>() == null && !hit.transform.CompareTag("Terrain") && !hit.transform.GetComponent<Collider>().isTrigger )
+        if (Physics.Raycast(pos, dir, out hit, length) && (hit.transform.GetComponent<wallHeightAdjust>()==null) && (!hit.transform.GetComponent<Collider>().isTrigger || (hit.transform.GetComponent<TrapWeapons>() != null)) )
         {
             return true;
         }
