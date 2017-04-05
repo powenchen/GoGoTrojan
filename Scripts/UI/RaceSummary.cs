@@ -60,9 +60,7 @@ public class RaceSummary : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        description.text = "Level = " + StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("level").n;
-
+		
     }
 
     public void ToMainMenu () {

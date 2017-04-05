@@ -75,7 +75,7 @@ public class MapGen : MonoBehaviour
         skillCD = 1;
         speed = 120;
         defense = 100;
-        StaticVariables.characterID = 4;
+        StaticVariables.characterID = 3;
         /***** TODO - For debug *****/
 
         initCharacter(StaticVariables.mapID, StaticVariables.carID, StaticVariables.characterID, hp,mp, atk,defense, speed, skillCD,0, true);
