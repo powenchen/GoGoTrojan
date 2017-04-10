@@ -86,8 +86,7 @@ public class TimeStopSkill : Skill
                 {
                     Vector3 posCenter = new Vector3(
                         point.transform.position.x,
-                        point.transform.position.y -
-                        point.transform.localScale.y / 2,
+                        point.transform.position.y,
                         point.transform.position.z
                     );
                     Vector3 posLeft = posCenter - point.transform.right * 5f;
@@ -98,7 +97,7 @@ public class TimeStopSkill : Skill
                     foreach (Car car in FindObjectsOfType<Car>())
                     {
 
-                        Debug.Log("dist from center " + (car.transform.position - posCenter).magnitude);
+                       // Debug.Log("dist from center " + (car.transform.position - posCenter).magnitude);
                         if ((car.transform.position - posCenter).magnitude < 3f)
                         {
                             pos = posLeft;
@@ -116,7 +115,7 @@ public class TimeStopSkill : Skill
                         }
                     }
                     spawnRot = point.transform.rotation;
-                    Debug.Log("orig = "+ distCurr + " spawn to " + point.name +"("+spawnStr+ ") dist = "+ distNext);
+                    //Debug.Log("orig = "+ distCurr + " spawn to " + point.name +"("+spawnStr+ ") dist = "+ distNext);
                     break;
                 }
             }

@@ -42,6 +42,7 @@ public class PlayerTimer : MonoBehaviour {
 		// when test time = 3, 2, 1
 		if ( testTime >= 1 && testTime <=3) {
             StaticVariables.musicStartFlag = true;
+            FindObjectOfType<AudioListener>().enabled = true;
 			preTimerText.text = testTime.ToString ();
 
 		} 

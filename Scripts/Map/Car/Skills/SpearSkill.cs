@@ -37,8 +37,7 @@ public class SpearSkill : Skill {
             }
             Vector3 spawnPos = new Vector3(
                 respawnPoint.transform.position.x,
-                respawnPoint.transform.position.y -
-                respawnPoint.transform.localScale.y / 2,
+                respawnPoint.transform.position.y,
                 respawnPoint.transform.position.z
                 ) ;
             Vector3 posCenter = spawnPos+ new Vector3(posRandom * Random.value - 0.5f * posRandom, 0, posRandom * Random.value - 0.5f * posRandom);

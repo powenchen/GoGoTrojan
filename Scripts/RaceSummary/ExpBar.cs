@@ -6,20 +6,24 @@ using UnityEngine.UI;
 public class ExpBar : MonoBehaviour {
     public float debugExp = -1;
     private float pointsToGain;
-    public float speed = 100;
+    private float speed = 100;
+    public float totalTime = 3;
 	public float maxWidth = 500;
-	// Use this for initialization
+    // Use this for initialization
+
+    public float accExp = 0;
 
 	public Text description;
 	void Start () {
-        Load.initialize();
+        Load.initialize(true);
         if (debugExp != -1)
         {
             StaticVariables.expGained = debugExp;
         }
         pointsToGain = StaticVariables.expGained;
 
-		description.text = "Level = " + StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("level").n;
+        speed = StaticVariables.expGained / totalTime;
+        description.text = "Level = " + StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("level").n;
 		description.text += "\nHP = " + StaticVariables.GetCharacterAttribute (StaticVariables.characterID).GetField ("hp").n;
 		description.text += "\nMP = " + StaticVariables.GetCharacterAttribute (StaticVariables.characterID).GetField ("mp").n;
 		description.text += "\nAttack = " + StaticVariables.GetCharacterAttribute (StaticVariables.characterID).GetField ("attack").n;
@@ -31,41 +35,39 @@ public class ExpBar : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
-        if (pointsToGain <= 0)
+	void Update ()
+    {
+        float currExp = StaticVariables.GetCharacterAttribute(StaticVariables.characterID)["currentExp"].n;
+        float maxExp = StaticVariables.GetCharacterAttribute(StaticVariables.characterID)["maxExpForThisLevel"].n;
+        float width = maxWidth * currExp / maxExp;
+        GetComponent<RectTransform>().sizeDelta = new Vector2(width, GetComponent<RectTransform>().sizeDelta.y);
+        if (pointsToGain > 0)
         {
-            return;
+            ExpGrow();
         }
-        ExpGrow();
+        
 
-		float currExp = StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("currentExp").n;
-		Debug.Log("currentExp = " + currExp);
     }
 
     private void ExpGrow()
     {
-
-		Debug.Log("path = " + Application.persistentDataPath + "/savedata.json");
         float maxExp = StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("maxExpForThisLevel").n;
-        Debug.Log("maxExp = " + maxExp);
         float currExp = StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("currentExp").n;
-        Debug.Log("currentExp = " + currExp);
         float level = StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("level").n;
-        Debug.Log("level = " + level);
 
         float expGrowInUpdate =
             Mathf.Min(Time.deltaTime * speed, pointsToGain);
         float expGrow = Mathf.Min(expGrowInUpdate, maxExp - currExp);
-        Debug.Log("expGrow = " + expGrow);
-		float width = maxWidth*(expGrow + currExp )/ maxExp;
-        StaticVariables.saveData.GetField("characters").list[StaticVariables.characterID].SetField("exp", expGrow + currExp);
-        GetComponent<RectTransform>().sizeDelta = new Vector2(width, GetComponent<RectTransform>().sizeDelta.y);
+        //Debug.Log("expGrow = " + expGrow);
+        StaticVariables.saveData["characters"].list[StaticVariables.characterID]["exp"].n= expGrow + currExp;
         pointsToGain -= expGrow;
+        accExp += expGrow;
+        
         if (expGrow + currExp == maxExp)
         {
 			LevelUp();
 			float previousLv = StaticVariables.GetCharacterAttribute (StaticVariables.characterID).GetField ("level").n;
-			if (previousLv >= StaticVariables.characterData.GetField ("maxLevel").n) 
+			if (previousLv >= StaticVariables.characterData["maxLevel"].n) 
 			{
 				StaticVariables.saveData.GetField ("characters").list [StaticVariables.characterID].SetField ("exp", 0);
 				pointsToGain = 0;

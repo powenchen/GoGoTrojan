@@ -14,6 +14,7 @@ public class CarCheckPoint : MonoBehaviour {
         if(other.GetComponent<Car>() != null)
         {
             ranking.SetCarDist(other.GetComponent<Car>(), dist);
+            //Debug.Log("car " + other.name + " pass point " + dist + " at "+name);
         }
 	}
     

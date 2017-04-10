@@ -347,8 +347,7 @@ public class Car : MonoBehaviour
         }
         Vector3 posCenter = new Vector3(
             respawnPoint.transform.position.x,
-            respawnPoint.transform.position.y -
-            respawnPoint.transform.localScale.y/2 + 1,
+            respawnPoint.transform.position.y,
             respawnPoint.transform.position.z
             );
         Vector3 posLeft = posCenter - respawnPoint.transform.right * 5f;

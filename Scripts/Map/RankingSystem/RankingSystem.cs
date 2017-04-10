@@ -60,8 +60,13 @@ public class RankingSystem : MonoBehaviour {
 
     public void SetCarDist(Car car, int dist)
     {
-        carDistMapping[car] = dist;
-        car.setRespawnIdx(dist);
+        if (!carDistMapping.ContainsKey(car))
+            carDistMapping.Add(car, -1);
+        if (carDistMapping[car] < dist)
+        {
+            carDistMapping[car] = dist;
+            car.setRespawnIdx(dist);
+        }
     }
 
     public int GetCarDist(Car car)
