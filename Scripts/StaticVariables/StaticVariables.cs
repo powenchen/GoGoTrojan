@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StaticVariables : MonoBehaviour {
+public class StaticVariables : MonoBehaviour
+{
     public static int ranking = -1;
     public static bool gameIsOver = false;
     public static bool gameStarts = false;
@@ -34,24 +35,24 @@ public class StaticVariables : MonoBehaviour {
         coinNumber = 0;
         // dont reset savedata
     }
-    
+
     public static JSONObject GetCarStatus(int carID)
     {
         // return the car data json object based on car id and savedata
-        return saveData["cars"].list[carID];
+        return saveData.GetField("cars").list[carID];
     }
-    
+
     public static JSONObject GetCharacterStatus(int charID)
     {
         // return the Character data json object based on character id and savedata
-        return saveData["characters"].list[charID];
+        return saveData.GetField("characters").list[charID];
     }
-    
+
 
     public static int GetTotalCoins()
     {
         // return TotalCoins number
-        return (int)(saveData["totalCoins"].n);
+        return (int)(saveData.GetField("totalCoins").n);
     }
 
     public static void SetTotalCoins(float totalNum)
@@ -62,7 +63,7 @@ public class StaticVariables : MonoBehaviour {
     public static int GetProgress()
     {
         // return TotalCoins number
-        return (int)(saveData["progress"].n);
+        return (int)(saveData.GetField("progress").n);
     }
 
     public static void SetProgress(int progress)
@@ -73,37 +74,47 @@ public class StaticVariables : MonoBehaviour {
 
     public static float GetCurrentCarLevel(int carIndex)
     {
-        return saveData["cars"].list[carIndex]["level"].n;
+        return saveData.GetField("cars").list[carIndex].GetField("level").n;
     }
+
+    public static string GetCarSlotAttribute(int carIndex, int slotIndex)
+    {
+        if (carIndex < 0 || carIndex > carData["cars"].list.Count || slotIndex < 0 || slotIndex > 2)
+        {
+            return "ERROR";
+        }
+        return carData["cars"][carIndex]["slotAttributes"][slotIndex].str;
+    }
+
 
     // return [hp, mp, speed,CD, attack, defense]
     public static List<float> GetCurrentCarAttribute(int carIndex)
     {
         List<float> ret = new List<float>();
-        float basePoint = carData["cars"].list[carIndex]["baseStatus"]["hp"].n;
-        float levelModifier = carData["cars"].list[carIndex]["statusModifier"]["hp"].n;
+        float basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("hp").n;
+        float levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("hp").n;
         float levelDiff = GetCurrentCarLevel(carIndex) - 1;
 
-        ret.Add(levelDiff * levelModifier + basePoint );
-
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["mp"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["mp"].n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["speed"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["speed"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("mp").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("mp").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["CD"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["CD"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("speed").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("speed").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["attack"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["attack"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("CD").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("CD").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["defense"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["defense"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("attack").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("attack").n;
+        ret.Add(levelDiff * levelModifier + basePoint);
+
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("defense").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("defense").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
 
@@ -114,36 +125,36 @@ public class StaticVariables : MonoBehaviour {
     // return null if there is no next level
     public static List<float> GetNextLevelCarAttribute(int carIndex)
     {
-        if (GetCurrentCarLevel(carIndex) == carData["maxLevel"].n)
+        if (GetCurrentCarLevel(carIndex) == carData.GetField("maxLevel").n)
         {
             return null;
         }
 
         List<float> ret = new List<float>();
-        float basePoint = carData["cars"].list[carIndex]["baseStatus"]["hp"].n;
-        float levelModifier = carData["cars"].list[carIndex]["statusModifier"]["hp"].n;
+        float basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("hp").n;
+        float levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("hp").n;
         float levelDiff = GetCurrentCarLevel(carIndex);
 
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["mp"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["mp"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("mp").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("mp").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["speed"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["speed"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("speed").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("speed").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["CD"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["CD"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("CD").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("CD").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["attack"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["attack"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("attack").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("attack").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
-        basePoint = carData["cars"].list[carIndex]["baseStatus"]["defense"].n;
-        levelModifier = carData["cars"].list[carIndex]["statusModifier"]["defense"].n;
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("defense").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("defense").n;
         ret.Add(levelDiff * levelModifier + basePoint);
 
 
@@ -160,22 +171,22 @@ public class StaticVariables : MonoBehaviour {
         {
             currentLevel = (int)GetCurrentCarLevel(carIndex);
         }
-        if (currentLevel == (int)(carData["maxLevel"].n))
+        if (currentLevel == (int)(carData.GetField("maxLevel").n))
         {
             return -1;
         }
-        return carData["cars"].list[carIndex]["price"].list[currentLevel].n;
+        return carData.GetField("cars").list[carIndex].GetField("price").list[currentLevel].n;
     }
 
     // return true if it is locked
     public static bool GetLockStatus(int carIndex)
     {
-        return carData["cars"].list[carIndex]["unlocked"].n < GetProgress();
+        return carData.GetField("cars").list[carIndex].GetField("unlocked").n < GetProgress();
     }
 
     public void SetCurrentCarLevel(int carIndex, int currentLevel)
     {
-        saveData["cars"].list[carIndex].SetField("level", currentLevel);
+        saveData.GetField("cars").list[carIndex].SetField("level", currentLevel);
     }
 
     // return [hp, mp, speed,CD, attack, defense]
@@ -190,51 +201,62 @@ public class StaticVariables : MonoBehaviour {
         float speedModifier = 1;
         float CDmodifier = 1;
 
-        for ( int i = 0;i< carData["cars"].list[carIndex]["slotAttributes"].list.Count; ++i)
+        for (int i = 0; i < carData.GetField("cars").list[carIndex].GetField("slotAttributes").list.Count; ++i)
         {
-            string slotAttr = carData["cars"].list[carIndex]["slotAttributes"].list[i].str;
+            string slotAttr = carData.GetField("cars").list[carIndex].GetField("slotAttributes").list[i].str;
             if (slotAttr.Equals("ATK"))
             {
-                int cardID = (int)saveData["cars"].list[carIndex]["slots"].list[i].n;
-                string cardName = cardData["ATK"].list[cardID]["name"].str;
-                if (cardName.StartsWith("atkIncrease"))
+                int cardID = (int)saveData.GetField("cars").list[carIndex].GetField("slots").list[i].n;
+
+                if (cardID != -1)
                 {
-                    attackModifier += cardData["ATK"].list[cardID]["attributes"].list[0].n;
+                    string cardName = cardData.GetField("ATK").list[cardID].GetField("name").str;
+                    if (cardName.StartsWith("atkIncrease"))
+                    {
+                        attackModifier += cardData.GetField("ATK").list[cardID].GetField("attributes").list[0].n;
+                    }
                 }
             }
             else if (slotAttr.Equals("DEF"))
             {
-                int cardID = (int)saveData["cars"].list[carIndex]["slots"].list[i].n;
-                string cardName = cardData["DEF"].list[cardID]["name"].str;
-                if (cardName.StartsWith("increaseHP"))
+                int cardID = (int)saveData.GetField("cars").list[carIndex].GetField("slots").list[i].n;
+                if (cardID != -1)
                 {
-                    hpModifier += cardData["DEF"].list[cardID]["attributes"].list[0].n;
-                }
-                else if (cardName.StartsWith("defIncrease"))
-                {
-                    defenseModifier += cardData["DEF"].list[cardID]["attributes"].list[0].n;
+                    string cardName = cardData.GetField("DEF").list[cardID].GetField("name").str;
+                    if (cardName.StartsWith("increaseHP"))
+                    {
+                        hpModifier += cardData.GetField("DEF").list[cardID].GetField("attributes").list[0].n;
+                    }
+                    else if (cardName.StartsWith("defIncrease"))
+                    {
+                        defenseModifier += cardData.GetField("DEF").list[cardID].GetField("attributes").list[0].n;
+                    }
                 }
             }
             else if (slotAttr.Equals("SPE"))
             {
-                int cardID = (int)saveData["cars"].list[carIndex]["slots"].list[i].n;
-                string cardName = cardData["SPE"].list[cardID]["name"].str;
-                if (cardName.StartsWith("mpIncrease"))
+                int cardID = (int)saveData.GetField("cars").list[carIndex].GetField("slots").list[i].n;
+                if (cardID != -1)
                 {
-                    mpModifier += cardData["SPE"].list[cardID]["attributes"].list[0].n;
-                }
-                else if (cardName.StartsWith("CDIncrease"))
-                {
-                    CDmodifier += cardData["SPE"].list[cardID]["attributes"].list[0].n;
-                }
-                else if (cardName.StartsWith("speedIncrease"))
-                {
-                    speedModifier += cardData["SPE"].list[cardID]["attributes"].list[0].n;
-                }
-                else if (cardName.StartsWith("tradeHealth"))
-                {
-                    hpModifier -= cardData["SPE"].list[cardID]["attributes"].list[0].n;
-                    speedModifier += cardData["SPE"].list[cardID]["attributes"].list[1].n;
+
+                    string cardName = cardData.GetField("SPE").list[cardID].GetField("name").str;
+                    if (cardName.StartsWith("mpIncrease"))
+                    {
+                        mpModifier += cardData.GetField("SPE").list[cardID].GetField("attributes").list[0].n;
+                    }
+                    else if (cardName.StartsWith("CDIncrease"))
+                    {
+                        CDmodifier += cardData.GetField("SPE").list[cardID].GetField("attributes").list[0].n;
+                    }
+                    else if (cardName.StartsWith("speedIncrease"))
+                    {
+                        speedModifier += cardData.GetField("SPE").list[cardID].GetField("attributes").list[0].n;
+                    }
+                    else if (cardName.StartsWith("tradeHealth"))
+                    {
+                        hpModifier -= cardData.GetField("SPE").list[cardID].GetField("attributes").list[0].n;
+                        speedModifier += cardData.GetField("SPE").list[cardID].GetField("attributes").list[1].n;
+                    }
                 }
 
             }
@@ -255,7 +277,7 @@ public class StaticVariables : MonoBehaviour {
     public static List<float> GetCurrentCardInSlot(int carIndex)
     {
         List<float> ret = new List<float>();
-        foreach (JSONObject card in saveData["cars"].list[carIndex]["slots"].list)
+        foreach (JSONObject card in saveData.GetField("cars").list[carIndex].GetField("slots").list)
         {
             ret.Add(card.n);
         }
@@ -269,57 +291,64 @@ public class StaticVariables : MonoBehaviour {
         {
             return;
         }
-        string attribute = carData["cars"].list[carIndex]["slotAttributes"].list[slotNumber].str;
+        string attribute = carData.GetField("cars").list[carIndex].GetField("slotAttributes").list[slotNumber].str;
         JSONObject newSlots = new JSONObject(JSONObject.Type.ARRAY);
-        for(int i=0;i< saveData["cars"].list[carIndex]["slots"].list.Count;++i)
+        for (int i = 0; i < saveData.GetField("cars").list[carIndex].GetField("slots").list.Count; ++i)
         {
             if (i == slotNumber)
             {
                 newSlots.Add(-1);
-                float number = saveData["cards"][attribute].list[cardIdx]["number"].n;
-                float maxNumber = saveData["cards"][attribute].list[cardIdx]["maxNumber"].n;
-                saveData["cards"][attribute].list[cardIdx].SetField("number", Mathf.Min(number + 1, maxNumber));
+                float number = saveData.GetField("cards").GetField(attribute).list[cardIdx].GetField("number").n;
+                float maxNumber = saveData.GetField("cards").GetField(attribute).list[cardIdx].GetField("maxNumber").n;
+                saveData.GetField("cards").GetField(attribute).list[cardIdx].SetField("number", Mathf.Min(number + 1, maxNumber));
             }
             else
             {
-                newSlots.Add(saveData["cars"].list[carIndex]["slots"].list[i]);
+                newSlots.Add(saveData.GetField("cars").list[carIndex].GetField("slots").list[i]);
             }
         }
-        saveData["cars"].list[carIndex].SetField("slots", newSlots);
+        saveData.GetField("cars").list[carIndex].SetField("slots", newSlots);
     }
 
     public static void SetCurrentCardInSlot(int carIndex, int slotNumber, int cardID)
     {
         int oldCardIdx = (int)GetCurrentCardInSlot(carIndex)[slotNumber];
-        string attribute = carData["cars"].list[carIndex]["slotAttributes"].list[slotNumber].str;
+        string attribute = carData.GetField("cars").list[carIndex].GetField("slotAttributes").list[slotNumber].str;
 
-        if (saveData["cards"][attribute].list[oldCardIdx]["number"].n <= 0)
+        if (oldCardIdx != -1 && saveData.GetField("cards").GetField(attribute).list[oldCardIdx].GetField("number").n <= 0)
         {
             // no available cards
             return;
         }
 
         JSONObject newSlots = new JSONObject(JSONObject.Type.ARRAY);
-        for (int i = 0; i < saveData["cars"].list[carIndex]["slots"].list.Count; ++i)
+        for (int i = 0; i < saveData.GetField("cars").list[carIndex].GetField("slots").list.Count; ++i)
         {
             if (i == slotNumber)
             {
                 newSlots.Add(cardID);
-                float oldNumber = saveData["cards"][attribute].list[oldCardIdx]["number"].n;
-                float oldMaxNumber = saveData["cards"][attribute].list[oldCardIdx]["maxNumber"].n;
-                float newNumber = saveData["cards"][attribute].list[cardID]["number"].n;
-
+                float newNumber = saveData.GetField("cards").GetField(attribute).list[cardID].GetField("number").n;
+                if (newNumber <= 0)
+                {
+                    return;
+                }
                 //remove old card from slot
-                saveData["cards"][attribute].list[oldCardIdx].SetField("number", Mathf.Min(oldNumber + 1, oldMaxNumber));
+                if (oldCardIdx != -1)
+                {
+                    float oldNumber = saveData.GetField("cards").GetField(attribute).list[oldCardIdx].GetField("number").n;
+                    float oldMaxNumber = saveData.GetField("cards").GetField(attribute).list[oldCardIdx].GetField("maxNumber").n;
+                    saveData.GetField("cards").GetField(attribute).list[oldCardIdx].SetField("number", Mathf.Min(oldNumber + 1, oldMaxNumber));
+                }
                 //insert new card to slot
-                saveData["cards"][attribute].list[cardID].SetField("number", Mathf.Max(newNumber - 1, 0));
+
+                saveData.GetField("cards").GetField(attribute).list[cardID].SetField("number", Mathf.Max(newNumber - 1, 0));
             }
             else
             {
-                newSlots.Add(saveData["cars"].list[carIndex]["slots"].list[i]);
+                newSlots.Add(saveData.GetField("cars").list[carIndex].GetField("slots").list[i]);
             }
         }
-        saveData["cars"].list[carIndex].SetField("slots", newSlots);
+        saveData.GetField("cars").list[carIndex].SetField("slots", newSlots);
     }
 
     public static JSONObject GetCardInfo(string attribute, int cardID)
@@ -330,7 +359,9 @@ public class StaticVariables : MonoBehaviour {
          *  "name":string,
          *  "type":string,
          *  "number":float,
-         *  "maxNumber":float
+         *  "maxNumber":float,
+         *  "rank":string,
+         *  "sellPrice":float
          * }
          */
         if (!attribute.Equals("ATK") && !attribute.Equals("DEF") && !attribute.Equals("SPE"))
@@ -339,10 +370,13 @@ public class StaticVariables : MonoBehaviour {
             return null;
         }
         JSONObject ret = new JSONObject(JSONObject.Type.OBJECT);
-        ret.AddField("name",cardData[attribute].list[cardID]["name"].str);
-        ret.AddField("type",attribute);
-        ret.AddField("number",saveData["cards"][attribute].list[cardID]["number"].n);
-        ret.AddField("maxNumber", saveData["cards"][attribute].list[cardID]["maxNumber"].n);
+        ret.AddField("name", cardData.GetField(attribute).list[cardID].GetField("name").str);
+        ret.AddField("type", attribute);
+        ret.AddField("number", saveData.GetField("cards").GetField(attribute).list[cardID].GetField("number").n);
+        ret.AddField("maxNumber", saveData.GetField("cards").GetField(attribute).list[cardID].GetField("maxNumber").n);
+        string rank = cardData[attribute][cardID]["rank"].str;
+        ret.AddField("rank", rank);
+        ret.AddField("sellPrice", cardData.GetField("price")[rank].n);
 
         return ret;
     }
@@ -366,31 +400,32 @@ public class StaticVariables : MonoBehaviour {
          * }
          */
         JSONObject ret = new JSONObject(JSONObject.Type.OBJECT);
-        ret.AddField("unlocked", GetProgress() >= characterData["characters"].list[charID]["unlocked"].n);
-        ret.AddField("level", saveData["characters"].list[charID]["level"].n);
-        ret.AddField("currentExp", saveData["characters"].list[charID]["exp"].n);
-        float lvlDiff = saveData["characters"].list[charID]["level"].n - 1;
-        float maxExp = characterData["baseExp"].n * Mathf.Pow(characterData["expModifier"].n, lvlDiff);
+        ret.AddField("unlocked", GetProgress() >= characterData.GetField("characters").list[charID].GetField("unlocked").n);
+        ret.AddField("level", saveData.GetField("characters").list[charID].GetField("level").n);
+        ret.AddField("currentExp", saveData.GetField("characters").list[charID].GetField("exp").n);
+        float lvlDiff = saveData.GetField("characters").list[charID].GetField("level").n - 1;
+        float maxExp = characterData.GetField("baseExp").n * Mathf.Pow(characterData.GetField("expModifier").n, lvlDiff);
         ret.AddField("maxExpForThisLevel", maxExp);
 
-        float hp = characterData["characters"].list[charID]["baseStatus"]["hp"].n + lvlDiff * characterData["characters"].list[charID]["statusModifier"]["hp"].n;
+        float hp = characterData.GetField("characters").list[charID].GetField("baseStatus").GetField("hp").n + lvlDiff * characterData.GetField("characters").list[charID].GetField("statusModifier").GetField("hp").n;
         ret.AddField("hp", hp);
-        float mp = characterData["characters"].list[charID]["baseStatus"]["mp"].n + lvlDiff * characterData["characters"].list[charID]["statusModifier"]["mp"].n;
+        float mp = characterData.GetField("characters").list[charID].GetField("baseStatus").GetField("mp").n + lvlDiff * characterData.GetField("characters").list[charID].GetField("statusModifier").GetField("mp").n;
         ret.AddField("mp", mp);
-        float speed = characterData["characters"].list[charID]["baseStatus"]["speed"].n + lvlDiff * characterData["characters"].list[charID]["statusModifier"]["speed"].n;
+        float speed = characterData.GetField("characters").list[charID].GetField("baseStatus").GetField("speed").n + lvlDiff * characterData.GetField("characters").list[charID].GetField("statusModifier").GetField("speed").n;
         ret.AddField("speed", speed);
-        float attack = characterData["characters"].list[charID]["baseStatus"]["attack"].n + lvlDiff * characterData["characters"].list[charID]["statusModifier"]["attack"].n;
+        float attack = characterData.GetField("characters").list[charID].GetField("baseStatus").GetField("attack").n + lvlDiff * characterData.GetField("characters").list[charID].GetField("statusModifier").GetField("attack").n;
         ret.AddField("attack", attack);
-        float CD = characterData["characters"].list[charID]["baseStatus"]["CD"].n + lvlDiff * characterData["characters"].list[charID]["statusModifier"]["CD"].n;
+        float CD = characterData.GetField("characters").list[charID].GetField("baseStatus").GetField("CD").n + lvlDiff * characterData.GetField("characters").list[charID].GetField("statusModifier").GetField("CD").n;
         ret.AddField("CD", CD);
-        float defense = characterData["characters"].list[charID]["baseStatus"]["defense"].n + lvlDiff * characterData["characters"].list[charID]["statusModifier"]["defense"].n;
+        float defense = characterData.GetField("characters").list[charID].GetField("baseStatus").GetField("defense").n + lvlDiff * characterData.GetField("characters").list[charID].GetField("statusModifier").GetField("defense").n;
         ret.AddField("defense", defense);
-        ret.AddField("skillName", characterData["characters"].list[charID]["skillName"].str);
-        
+        ret.AddField("skillName", characterData.GetField("characters").list[charID].GetField("skillName").str);
+
         return ret;
     }
 
-    float GetSellPrice(string rank)
+
+float GetSellPrice(string rank)
     {
         return cardData["price"][rank].n;
     }

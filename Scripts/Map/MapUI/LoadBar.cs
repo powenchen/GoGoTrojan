@@ -13,7 +13,7 @@ public class LoadBar : MonoBehaviour
     private float progressThres;
     // Use this for initialization
     void Start () {
-        progressThres = 0.9f * maxProgress;
+        progressThres = 0.8f * maxProgress;
     }
 	
 	// Update is called once per frame
