@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MiniMapMark : MonoBehaviour {
-    public Transform MyCar;   
-    
+    public Transform MyCar;
+    private bool carExist = false;
 
     // Use this for initialization
     private void OnDrawGizmos()
@@ -33,6 +33,7 @@ public class MiniMapMark : MonoBehaviour {
     {
         if (MyCar != null)
         {
+            carExist = true;
             transform.position =
                 new Vector3(MyCar.position.x, transform.position.y, MyCar.position.z);
             transform.rotation = Quaternion.Euler(
@@ -42,6 +43,11 @@ public class MiniMapMark : MonoBehaviour {
                     transform.rotation.eulerAngles.z
                     )
             );
+        }
+        else if (carExist)
+        {
+            //car exist once but gone now
+            Destroy(gameObject);
         }
     }
 }

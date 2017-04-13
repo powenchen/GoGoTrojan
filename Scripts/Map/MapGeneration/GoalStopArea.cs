@@ -20,12 +20,7 @@ public class GoalStopArea : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log(other.tag);
-        if (other.CompareTag("Player"))
-        {
-            other.GetComponent<Car>().stopRunning();
-
-        }
-        else if (other.CompareTag("Enemy"))
+        if (other.GetComponent<Car>())
         {
             other.GetComponent<Car>().stopRunning();
 

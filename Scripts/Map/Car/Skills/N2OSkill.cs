@@ -12,13 +12,13 @@ public class N2OSkill : Skill
 
     private float N2OTimer = 0;
     private float N2OTime = 3;
-    private bool isN2OEmitting = false;
     private bool isN2OReady = true;
     
 
     // Use this for initialization
     void Start()
     {
+        isSkillUsing = false;
         rb = GetComponent<Rigidbody>();
         skillSound = SetUpEngineAudioSource(skillAudio);
     }
@@ -31,7 +31,7 @@ public class N2OSkill : Skill
 
     private void FixedUpdate()
     {
-        if (isN2OEmitting)
+        if (isSkillUsing)
         {
             if (Time.time - N2OTimer < N2OTime)
             { 
@@ -49,7 +49,7 @@ public class N2OSkill : Skill
     {
         skillSound.volume = 0;
         isN2OReady = true;
-        isN2OEmitting = false;
+        isSkillUsing = false;
         foreach (ParticleSystem N2O in N2OParticles)
         {
             N2O.Stop();
@@ -66,10 +66,10 @@ public class N2OSkill : Skill
 
         //originalTopSpeed = GetComponent<CarStatus>().topSpeed;
         GetComponent<CarStatus>().topSpeedModifier = N2OTopSpeedModifier ;
-        if (isN2OReady && !isN2OEmitting)
+        if (isN2OReady && !isSkillUsing)
         {
             isN2OReady = false;
-            isN2OEmitting = true;
+            isSkillUsing = true;
             foreach (ParticleSystem N2O in N2OParticles)
             {
                 N2O.Play();

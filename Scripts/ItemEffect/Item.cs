@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Item : Pickup
 {
-
 	// Use this for initialization
 	void Start () {
 		

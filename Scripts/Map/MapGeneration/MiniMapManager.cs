@@ -13,9 +13,11 @@ public class MiniMapManager : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
-	}
+	void Update ()
+    {
+        minimapCam = GetComponentInChildren<Camera>();
+
+    }
 
     public void setCamTarget(Transform player)
     {

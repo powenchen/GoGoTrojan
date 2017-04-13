@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LandMine : MonoBehaviour {
+public class LandMine : TrapWeapons { 
 
 	public GameObject explosion;
 
-	public float damageValue; // default value = 30
+    private float damageValue = 1.5f;
 
-	private bool alreadyPut;
+    private bool alreadyPut;
 
 
 	// Use this for initialization
@@ -26,13 +26,13 @@ public class LandMine : MonoBehaviour {
         if (other.GetComponent<Car>() != null)
         {
             // timestop mode is invincible
-            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing())
+            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing)
             {
                 return;
             }
             Instantiate(explosion, other.transform.position, other.transform.rotation);
 
-            other.GetComponent<Car>().decreaseHP(damageValue);
+            other.GetComponent<CarStatus>().isAttackedBy(attacker,damageValue);
             Destroy(gameObject);
         }
         

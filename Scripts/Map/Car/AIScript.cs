@@ -16,23 +16,28 @@ public class AIScript : MonoBehaviour {
     
     private Rigidbody rb;
 
-    private float sensorLength = 5;
-    private float sideSensorLength = 3;
+    private float sensorLength = 15;
+    private float sideSensorLength = 5;
     private float frontSensorStartPoint = 3;
     private float frontSensorMargin = 1;
     private float frontSensorAngle = 15;
-    private float avoidSpeed = 0.6f;
+    private float avoidSpeed = 1;
     private int flag = 0;
     private bool reversing = false;
     private float reverseTimer = 0;
-    private float waitToReverse = 2;
+    private float waitToReverse = 1.5f;
     private float reverseFor = 1.5f;
     private float stuckThreshlod = 10 * 1000 / 3600;//(10 km/h)
     private bool pauseFlag = false;
     private Car car;
 
+
     // Use this for initialization
     void Start () {
+        if (GetComponent<TimeStopSkill>() != null)
+        {
+            lookAhead *= 2;
+        }
         car = GetComponent<Car>();
         rb = GetComponent<Rigidbody>();
         if (path!=null)
@@ -107,7 +112,7 @@ public class AIScript : MonoBehaviour {
 
         if (nextPoint.magnitude < distThreshold)
         {
-            Debug.Log("AI passed point" + pathPointIdx + " " + pathPoints[pathPointIdx].position.ToString());
+            //Debug.Log("AI passed point" + pathPointIdx + " " + pathPoints[pathPointIdx].position.ToString());
             ++pathPointIdx;
         }
 
@@ -153,13 +158,15 @@ public class AIScript : MonoBehaviour {
             ++flag;
             if (!reversing)
             {
-                car.ApplyBrake(0.2f);
+                car.ApplyBrake(0.3f);
             }
             Debug.DrawLine(pos, hit.point, Color.red);
+            //skillDebugFlag = false;
         }
         else
         {
             car.ApplyBrake(0);
+            //skillDebugFlag = true;
         }
         
 
@@ -273,9 +280,13 @@ public class AIScript : MonoBehaviour {
         car.ApplySteer(newSteerFactor);
     }
 
-    private bool triggersSensor(Vector3 pos, Vector3 dir, RaycastHit hit, float sensorLength)
+    private bool triggersSensor(Vector3 pos, Vector3 dir, RaycastHit hit, float length)
     {
-        return Physics.Raycast(pos, dir, out hit, sideSensorLength) && hit.transform.GetComponent<CarCheckPoint>() == null && !hit.transform.CompareTag("Terrain") && !hit.transform.GetComponent<Collider>().isTrigger;
+        if (Physics.Raycast(pos, dir, out hit, length) && (hit.transform.GetComponent<wallHeightAdjust>()==null) && (!hit.transform.GetComponent<Collider>().isTrigger || (hit.transform.GetComponent<TrapWeapons>() != null)) )
+        {
+            return true;
+        }
+        return false;
     }
 
 }

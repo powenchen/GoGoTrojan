@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OilSpill : MonoBehaviour {
+public class OilSpill : TrapWeapons
+{
 
 	private bool alreadyPut;
 
-	// Use this for initialization
-	void Start () {
+    private float damageValue = 0;
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -21,10 +23,11 @@ public class OilSpill : MonoBehaviour {
         if (other.GetComponent<Car>() != null)
         {
             // timestop mode is invincible
-            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing())
+            if (other.GetComponent<TimeStopSkill>() != null && other.GetComponent<TimeStopSkill>().isSkillUsing)
             {
                 return;
             }
+            other.GetComponent<CarStatus>().isAttackedBy(attacker, damageValue);
             other.gameObject.AddComponent<Rotate>();
             Destroy(gameObject);
         }
@@ -36,4 +39,11 @@ public class OilSpill : MonoBehaviour {
 		// this item works only after player put this item
 		alreadyPut = true;
 	}*/
+}
+
+namespace Assets.Scripts.ItemEffect
+{
+    public class TrapWeapons
+    {
+    }
 }

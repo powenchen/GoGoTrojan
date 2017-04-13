@@ -51,8 +51,10 @@ public class BouncingWall : MonoBehaviour
                 Vector3 torque = -Mathf.Sign(localContactPoint.x) * transform.up * maxTorque * Mathf.Abs(localContactNormal.z);
                // Debug.Log("torque = " + torque.ToString());
                 rb.AddTorque(torque, ForceMode.Acceleration);
-
-                m.ApplyBrake(1);
+                if (m)
+                {
+                    m.ApplyBrake(1);
+                }
                /* Quaternion sparkRotation = new Quaternion();
                 sparkRotation.eulerAngles = contact.normal;
                 Vector3 sparkPosition = new Vector3(contact.point.x, contact.point.y * 0.5f, contact.point.z);

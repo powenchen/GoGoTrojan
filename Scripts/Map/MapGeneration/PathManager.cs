@@ -5,8 +5,19 @@ using UnityEngine;
 public class PathManager : MonoBehaviour
 {
     private Transform[] pathArray;
+    public GameObject checkPointPrefab;
+    public CheckPointManager checkPointManager;
+    private int checkPointDensity = 5;
     private void OnDrawGizmos()
     {
+        if (checkPointManager == null)
+        {
+            Debug.Log(name + " is initializing");
+            //GetComponentInSibling
+            checkPointManager = GetComponentInParent<CourseManager>().GetComponentInChildren<CheckPointManager>();
+        }
+
+        Gizmos.color = Color.blue;
         pathArray = GetComponentsInChildren<Transform>();
         for (int i = 1; i < pathArray.Length-1; ++i)
         {
@@ -22,8 +33,22 @@ public class PathManager : MonoBehaviour
 
     // Use this for initialization
     void Start () {
-		
-	}
+        int dist = 0;
+        pathArray = GetComponentsInChildren<Transform>();
+        for (int i = 1; i < pathArray.Length - 1; ++i)
+        {
+            //distribute ${checkPointDensity} checkpoints between pathArray[i] & pathArray[i+1]
+            for (int j = 0; j < checkPointDensity; ++j)
+            {
+                Vector3 spawnPos = (checkPointDensity - j) * pathArray[i].transform.position / (checkPointDensity) +
+                    (j) * pathArray[i + 1].transform.position / (checkPointDensity);
+                Quaternion spawnRot = Quaternion.FromToRotation(Vector3.forward, pathArray[i+1].position - pathArray[i].position);
+                GameObject checkPointObj = Instantiate(checkPointPrefab, spawnPos, spawnRot, checkPointManager.transform);
+                checkPointObj.GetComponent<CarCheckPoint>().ranking = GetComponentInParent<CourseManager>().ranking;
+                checkPointObj.GetComponent<CarCheckPoint>().dist = (dist++);
+            }
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -41,10 +66,6 @@ public class PathManager : MonoBehaviour
     {
 
         pathArray = GetComponentsInChildren<Transform>();
-        //Vector3 x = new Vector3(1, 0, 0), z = new Vector3(0, 0, 1), o = new Vector3(0, 0, 0);
-        //Quaternion x_p = Quaternion.FromToRotation(x, o), x_n = Quaternion.FromToRotation(o, x);
-        //Quaternion z_p = Quaternion.FromToRotation(z, o), z_n = Quaternion.FromToRotation(o,z);
-        //Debug.Log("x_p" + x_p.eulerAngles.ToString() + "x_n" + x_n.eulerAngles.ToString() + "z_p" + z_p.eulerAngles.ToString() + "z_n" + z_n.eulerAngles.ToString());
         return Quaternion.FromToRotation(Vector3.forward, pathArray[2].position - pathArray[1].position);
     }
 
@@ -52,13 +73,13 @@ public class PathManager : MonoBehaviour
     {
 
         pathArray = GetComponentsInChildren<Transform>();
-        return pathArray[pathArray.Length - 1].position;
+        return pathArray[pathArray.Length - 2].position;
     }
 
     public Quaternion endRotationOfPath()
     {
 
         pathArray = GetComponentsInChildren<Transform>();
-        return Quaternion.FromToRotation(Vector3.up, pathArray[pathArray.Length - 1].position - pathArray[pathArray.Length - 2].position);
+        return Quaternion.FromToRotation(Vector3.forward, pathArray[pathArray.Length - 2].position - pathArray[pathArray.Length - 3].position);
     }
 }

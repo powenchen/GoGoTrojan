@@ -6,18 +6,38 @@ using UnityEngine.SceneManagement;
 
 public class RaceSummary : MonoBehaviour {
 
-	public Text description;
+    public GameObject originalUI;
+    public GameObject loadUI;
+    public Text description;
 	public Text grade;
 	private int rank;
 	private int coin;
 	private string time;
+    
+    public GameObject[] characters;
 
-	public GameObject character1;
-	public GameObject character2;
-
-	// Use this for initialization
-	void Start () {
-
+    public int debugChar = -1;
+    public bool isStartDebug = false;
+    // Use this for initialization
+    void Awake () {
+        if (isStartDebug)
+        {
+            Load.initialize();
+            StaticVariables.GetCharacterAttribute(StaticVariables.characterID);
+        }
+        
+        if (debugChar != -1)
+        {
+            StaticVariables.characterID = debugChar;
+        }
+        for (int i =0;i< characters.Length;++i)
+        {
+            if (i == StaticVariables.characterID)
+            {
+                characters[i].SetActive(true);
+            }
+        }
+        /*
 		int playerID = PlayerPrefs.GetInt ("PlayerID");
 
 		if(playerID == 0) {
@@ -25,11 +45,12 @@ public class RaceSummary : MonoBehaviour {
 		} else if(playerID == 1) {
 			Destroy (character1);
 		}
-
+        */
         coin = StaticVariables.coinNumber;//PlayerPrefs.GetInt ("Coins");
 		rank = StaticVariables.ranking;
         time = StaticVariables.raceTimeStr;//PlayerPrefs.GetString ("TotalTime");
-        Debug.Log("rank = "+rank);
+        Debug.Log("rank = "+rank);    
+        /*
 		if (rank == 1) {
 			grade.text = "A";
 			description.text = "CONGRATULATIONS!\nYou were the FIRST ONE who reached the classroom!! You spent " + time + " to reach the classroom. Professor was very happy and decided to give you a BIG A!!";
@@ -38,17 +59,27 @@ public class RaceSummary : MonoBehaviour {
 			description.text = "UNFORTUNATELY...\nYou were NOT the first one who reached the classroom... You spent " + time + " to reach the classroom. As a result, you are not assigned an A... Try again!!";
 		}
 		description.text += "\nYou've eared " + coin + " coins during the race. You can go to store to make upgration!";
-        
+        */
 
 
     }
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
 
-	public void ToMainMenu () {
+        if (StaticVariables.ranking == 1)
+        {
+            grade.text = "YOU  WIN!!";
+        }
+        else
+        {
+
+            grade.text = "FAILED ... ";
+        }
+
+    }
+
+    public void ToMainMenu () {
 		SceneManager.LoadScene ("MainMenu");
 	}
 
@@ -57,7 +88,9 @@ public class RaceSummary : MonoBehaviour {
 	}
 
 	public void PlayAgain() {
-		SceneManager.LoadScene ("LA_large");
+        originalUI.SetActive(false);
+        loadUI.SetActive(true);
+        SceneManager.LoadSceneAsync ("LA_large");
 	}
 
 	public void QuitGame() {

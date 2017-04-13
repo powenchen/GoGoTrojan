@@ -5,8 +5,13 @@ using System.IO;
 
 public class Save : MonoBehaviour {
 
-    public static void saveState(string filePath)
+    // call this function after
+    // 1. comlpeting an upgrade
+    // 2. equipping/removing a card
+    // 3. finishing a race
+    public static void saveState()
     {
+        string filePath = Application.persistentDataPath + "/savedata.json";
         if (StaticVariables.saveData != null)
         {
             string saveStr = StaticVariables.saveData.ToString();

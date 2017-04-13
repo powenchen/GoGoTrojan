@@ -15,7 +15,7 @@ public class SLTest_debug : MonoBehaviour
             string dummy = "{\"characters\":[{\"MaxHP\":123,\"MaxMP\":456,\"SkillCD\":78,\"AttackPower\":9}],\"TotalCoins\":0}";
             File.WriteAllText(Application.persistentDataPath + "/savedata.json", dummy);
         }
-        Load.loadState(Application.persistentDataPath + "/savedata.json");
+        Load.loadState();
     }
 
     // Update is called once per frame
@@ -38,7 +38,7 @@ public class SLTest_debug : MonoBehaviour
         }
         //sample code
 		JSONObject charData = StaticVariables.GetCharacterStatus(0);
-		Debug.Log(charData.GetField("MaxMP"));
+		Debug.Log(charData.GetField("MaxMP").n);
 		charData.SetField("MaxMP", charData.GetField("MaxMP").n + 10);
         charData.SetField("MaxHP", charData.GetField("MaxHP").n + 15);
 
@@ -46,7 +46,7 @@ public class SLTest_debug : MonoBehaviour
         int coinT = StaticVariables.GetTotalCoins();
         StaticVariables.SetTotalCoins(coinT+100);
 
-        Save.saveState(Application.persistentDataPath + "/savedata.json");
+        Save.saveState();
         Debug.Log("new data saved!!");
     }
 }

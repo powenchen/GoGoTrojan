@@ -40,7 +40,7 @@ public class StatImageManager : MonoBehaviour {
         rightBtnText.text = "Continue";
         leftBtnText.text = "Play Again";
 
-        totalCarNum = FindObjectsOfType<Car>().Length;
+        totalCarNum = FindObjectsOfType<AIScript>().Length+1;
         coinText.text = "Coins get: " + StaticVariables.coinNumber.ToString();
         timeText.text = "Time: " + StaticVariables.raceTimeStr;
         //PlayerPrefs.SetString("TotalTime", GetComponentInParent<PlayerTimer>().GetTotalTime());

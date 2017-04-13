@@ -6,26 +6,30 @@ public class Barlength : MonoBehaviour {
     public bool isHPBar ;
     private RectTransform rectTransform;
     private Car car;
+    private CarStatus carStatus;
     // Use this for initialization
     void Start () {
         rectTransform = GetComponent<RectTransform>();
         car = GetComponentInParent<Car>();
-	}
+        carStatus = GetComponentInParent<CarStatus>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        float width = 2;
+        float maxWidth = 2;
+        float width = maxWidth;
         if (car != null)
         {
             if (isHPBar)
             {
-                width *= (car.getHP() / car.getMaxHP());
+                width *= (carStatus.getHP() / carStatus.getMaxHP());
             }
             else
             {
-                width *= (car.getMP() / car.getMaxMP());
+                width *= (carStatus.getMP() / carStatus.getMaxMP());
             }
         }
+        width = Mathf.Clamp(width, 0, 2);
         rectTransform.sizeDelta = new Vector2(width, rectTransform.sizeDelta.y);
     }
 

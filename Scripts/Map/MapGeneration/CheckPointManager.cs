@@ -16,8 +16,13 @@ public class CheckPointManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
-	}
+
+        CarCheckPoint[] points = GetComponentsInChildren<CarCheckPoint>();
+        for (int i = 0; i < points.Length; ++i)
+        {
+            points[i].dist = i;
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {

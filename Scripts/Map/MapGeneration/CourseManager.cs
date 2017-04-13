@@ -5,13 +5,25 @@ using UnityEngine;
 public class CourseManager : MonoBehaviour {
     private PathManager path;
     private StartPointManager startPoint;
-    public GameObject startPrefab;
+    private GoalManager goalPoint;
+    public RankingSystem ranking;
+    
     // Use this for initialization
-    void Start () {
-        Debug.Log("in start");
-        startPoint = GetComponentInChildren<StartPointManager>();
+    void OnDrawGizmos () {
+        initPositions();
+    }
+
+    private void Start()
+    {
+        initPositions();
+    }
+
+    void initPositions()
+    {
         path = GetComponentInChildren<PathManager>();
-        if (startPoint == null)
+        startPoint = GetComponentInChildren<StartPointManager>();
+        goalPoint = GetComponentInChildren<GoalManager>();
+        if (startPoint != null && path != null && goalPoint != null)
         {
             Quaternion startRotation = Quaternion.Euler(
                 new Vector3(
@@ -20,20 +32,22 @@ public class CourseManager : MonoBehaviour {
                     0
                     )
                 );
-            Instantiate(startPrefab, path.startPositionOfPath(), startRotation).transform.parent = transform;
-
-            startPoint = GetComponentInChildren<StartPointManager>();
+            Quaternion goalRotation = Quaternion.Euler(
+                new Vector3(
+                    0,
+                    path.endRotationOfPath().eulerAngles.y,
+                    0
+                    )
+                );
+            startPoint.transform.position = path.startPositionOfPath();
+            startPoint.transform.rotation = startRotation;
+            goalPoint.transform.position = path.endPositionOfPath();
+            goalPoint.transform.rotation = goalRotation;
+            return;
         }
-        //
-        if (startPoint == null)
-        {
-            Debug.Log("course has no start point");
-        }
-
     }
-        
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
 		
 	}
 
