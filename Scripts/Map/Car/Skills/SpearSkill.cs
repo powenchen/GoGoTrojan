@@ -14,7 +14,6 @@ public class SpearSkill : Skill {
 	// Update is called once per frame
 	void Update () {
         isSkillUsing = (weaponInstance != null);
-
     }
 
     public override void stopSkill()
@@ -25,10 +24,10 @@ public class SpearSkill : Skill {
     public override void activateSkill()
     {
         float posRandom = 3;
-        float angleRandom = 50;
+        float angleRandom = 40;
         CarStatus attacker = GetComponent<CarStatus>();
         int myDist = FindObjectOfType<RankingSystem>().GetCarDist(GetComponent<Car>());
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 50; i+=5)
         {
             CarCheckPoint respawnPoint = findCheckPoint(myDist + i);
             if (respawnPoint == null)
@@ -42,21 +41,25 @@ public class SpearSkill : Skill {
                 ) ;
             Vector3 posCenter = spawnPos+ new Vector3(posRandom * Random.value - 0.5f * posRandom, 0, posRandom * Random.value - 0.5f * posRandom);
             Quaternion spawnRotation = Quaternion.Euler(new Vector3(angleRandom * Random.value-0.5f* angleRandom, 0, angleRandom * Random.value - 0.5f * angleRandom));
+            //Quaternion spawnRotation = Quaternion.Euler(new Vector3(180 + angleRandom * Random.value - 0.5f * angleRandom, 0, angleRandom * Random.value - 0.5f * angleRandom));
             int spearIdx = Random.Range(0, spears.Length);
-            weaponInstance = Instantiate(spears[spearIdx], posCenter, spawnRotation);
+            weaponInstance = Instantiate(spears[spearIdx], posCenter + new Vector3(0,-10,0), spawnRotation);
             weaponInstance.GetComponent<TrapWeapons>().attacker = attacker;
+            weaponInstance.GetComponent<SpearTrap>().SetTarget(posCenter);
 
             Vector3 posLeft = spawnPos - respawnPoint.transform.right * 5f + new Vector3(posRandom * Random.value - 0.5f * posRandom, 0, posRandom * Random.value - 0.5f * posRandom);
             spawnRotation = Quaternion.Euler(new Vector3(angleRandom * Random.value - 0.5f * angleRandom, 0, angleRandom * Random.value - 0.5f * angleRandom));
             spearIdx = Random.Range(0, spears.Length);
-            weaponInstance = Instantiate(spears[spearIdx], posLeft, spawnRotation);
+            weaponInstance = Instantiate(spears[spearIdx], posLeft + new Vector3(0, -10, 0), spawnRotation);
             weaponInstance.GetComponent<TrapWeapons>().attacker = attacker;
+            weaponInstance.GetComponent<SpearTrap>().SetTarget(posLeft);
 
             Vector3 posRight = spawnPos + respawnPoint.transform.right * 5f + new Vector3(posRandom * Random.value - 0.5f * posRandom, 0, posRandom * Random.value - 0.5f * posRandom);
             spawnRotation = Quaternion.Euler(new Vector3(angleRandom * Random.value - 0.5f * angleRandom, 0, angleRandom * Random.value - 0.5f * angleRandom));
             spearIdx = Random.Range(0, spears.Length);
-            weaponInstance = Instantiate(spears[spearIdx], posRight, spawnRotation);
+            weaponInstance = Instantiate(spears[spearIdx], posRight + new Vector3(0, -10, 0), spawnRotation);
             weaponInstance.GetComponent<TrapWeapons>().attacker = attacker;
+            weaponInstance.GetComponent<SpearTrap>().SetTarget(posRight);
 
             isSkillUsing = true;
         }

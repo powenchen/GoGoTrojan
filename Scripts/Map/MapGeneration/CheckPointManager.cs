@@ -28,4 +28,15 @@ public class CheckPointManager : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public Transform[] GetCheckPointTrans()
+    {
+        CarCheckPoint[] points = GetComponentsInChildren<CarCheckPoint>();
+        Transform[] ret = new Transform[points.Length];
+        for (int i = 0; i < points.Length; ++i)
+        {
+            ret[i] = points[i].transform;
+        }
+        return ret;
+    }
 }

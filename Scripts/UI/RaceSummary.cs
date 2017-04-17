@@ -5,9 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class RaceSummary : MonoBehaviour {
-
-    public GameObject originalUI;
-    public GameObject loadUI;
+    
     public Text description;
 	public Text grade;
 	private int rank;
@@ -88,9 +86,8 @@ public class RaceSummary : MonoBehaviour {
 	}
 
 	public void PlayAgain() {
-        originalUI.SetActive(false);
-        loadUI.SetActive(true);
-        SceneManager.LoadSceneAsync ("LA_large");
+        //loadUI.SetActive(true);
+        SceneManager.LoadSceneAsync ("LoadScene");
 	}
 
 	public void QuitGame() {

@@ -5,17 +5,8 @@ using UnityEngine;
 public class PathManager : MonoBehaviour
 {
     private Transform[] pathArray;
-    public GameObject checkPointPrefab;
-    public CheckPointManager checkPointManager;
-    private int checkPointDensity = 5;
     private void OnDrawGizmos()
     {
-        if (checkPointManager == null)
-        {
-            Debug.Log(name + " is initializing");
-            //GetComponentInSibling
-            checkPointManager = GetComponentInParent<CourseManager>().GetComponentInChildren<CheckPointManager>();
-        }
 
         Gizmos.color = Color.blue;
         pathArray = GetComponentsInChildren<Transform>();
@@ -33,21 +24,8 @@ public class PathManager : MonoBehaviour
 
     // Use this for initialization
     void Start () {
-        int dist = 0;
         pathArray = GetComponentsInChildren<Transform>();
-        for (int i = 1; i < pathArray.Length - 1; ++i)
-        {
-            //distribute ${checkPointDensity} checkpoints between pathArray[i] & pathArray[i+1]
-            for (int j = 0; j < checkPointDensity; ++j)
-            {
-                Vector3 spawnPos = (checkPointDensity - j) * pathArray[i].transform.position / (checkPointDensity) +
-                    (j) * pathArray[i + 1].transform.position / (checkPointDensity);
-                Quaternion spawnRot = Quaternion.FromToRotation(Vector3.forward, pathArray[i+1].position - pathArray[i].position);
-                GameObject checkPointObj = Instantiate(checkPointPrefab, spawnPos, spawnRot, checkPointManager.transform);
-                checkPointObj.GetComponent<CarCheckPoint>().ranking = GetComponentInParent<CourseManager>().ranking;
-                checkPointObj.GetComponent<CarCheckPoint>().dist = (dist++);
-            }
-        }
+        
     }
 	
 	// Update is called once per frame
@@ -81,5 +59,15 @@ public class PathManager : MonoBehaviour
 
         pathArray = GetComponentsInChildren<Transform>();
         return Quaternion.FromToRotation(Vector3.forward, pathArray[pathArray.Length - 2].position - pathArray[pathArray.Length - 3].position);
+    }
+
+    public Transform[] GetPathTransform()
+    {
+        Transform[] pathT = new Transform[pathArray.Length];
+        for (int i = 0; i < pathArray.Length; ++i)
+        {
+            pathT[i] = pathArray[i].transform;
+        }
+        return pathT;
     }
 }

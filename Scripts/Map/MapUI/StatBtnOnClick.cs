@@ -9,6 +9,7 @@ public class StatBtnOnClick : MonoBehaviour
     private bool pauseFlag;
     public Button leaveBtn, againBtn;
     public StatImageManager statManager;
+    public GameObject reloadImage;
     // Use this for initialization
     void Start () {
 		
@@ -47,15 +48,13 @@ public class StatBtnOnClick : MonoBehaviour
             setPauseFlag(false);
             statManager.setPauseFlag(false);
             statManager.gameObject.SetActive(false);
-
-            PlayerPrefs.SetInt("Ranking", 999);
+            StaticVariables.ranking = 999;
             SceneManager.LoadScene("RaceSummary");
             return;
         }
         //clean Car flags on leaving la_large scene; 
         
-        Scene scene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(scene.name);
+        SceneManager.LoadSceneAsync("LoadScene");
     }
 
 

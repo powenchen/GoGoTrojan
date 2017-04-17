@@ -6,8 +6,10 @@ using UnityEngine.UI;
 public class PlayerTimer : MonoBehaviour {
 
 	public Text timerText;
-	public Text preTimerText;
-	private float startTime;
+    public Image preTimerImage;
+    public Sprite[] preTimersprites;
+
+    private float startTime;
 	private float departTime;
 
 	public string totalMinute;
@@ -22,7 +24,6 @@ public class PlayerTimer : MonoBehaviour {
         
         timerText.color = Color.red;
 		startTime = Time.time;
-		preTimerText.text = "";
 //		testTime = 1;
 		
 	}
@@ -43,27 +44,30 @@ public class PlayerTimer : MonoBehaviour {
 		if ( testTime >= 1 && testTime <=3) {
             StaticVariables.musicStartFlag = true;
             FindObjectOfType<AudioListener>().enabled = true;
-			preTimerText.text = testTime.ToString ();
+            //preTimerText.text = testTime.ToString ();
+            preTimerImage.sprite = preTimersprites[4 - testTime];
 
 		} 
 		else if (testTime == 0) {
-			
-			preTimerText.text = "GO!";
-			departTime = Time.time;
+
+            //preTimerText.text = "GO!";
+            preTimerImage.sprite = preTimersprites[4];
+            preTimerImage.CrossFadeAlpha(0,1,true);
+            departTime = Time.time;
 		}
 		else if(testTime < 0){
             //startrunning
             //Debug.Log("GAME START");
             StaticVariables.gameStarts = true;
-            preTimerText.text = "";
+            //preTimerText.text = "";
 
 			float timer = Time.time - departTime;
 			totalMinute = ((int)timer / 60).ToString ("D2");
 			totalSecond = ((int)timer % 60).ToString ("D2");
 			totalMiliSecond = ((int)(timer * 100) % 100).ToString ("D2");
-			timerText.text =totalMinute + ":" + totalSecond + ":" + totalMiliSecond;
+			timerText.text ="";
 
-            StaticVariables.raceTimeStr = totalMinute + ":" + totalSecond + ":" + totalMiliSecond;
+            StaticVariables.raceTimeStr = totalMinute + ":" + totalSecond + "." + totalMiliSecond;
 
         }
 	}

@@ -18,7 +18,9 @@ public class RankingSystem : MonoBehaviour {
                 carDistMapping.Add(car, -1);
         }
 		rankingText.text = "";
-	}
+
+        rankingText.color = (FindObjectOfType<Skybox>().material.name.StartsWith("Sunny")) ? Color.black : Color.white;
+    }
 	
 	// Update is called once per frame
 	void Update () {

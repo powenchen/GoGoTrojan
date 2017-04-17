@@ -4,22 +4,28 @@ using UnityEngine;
 
 public class lightSwitch : MonoBehaviour {
     private Light lightSource;
-    public bool lightOn = true;
     private void OnDrawGizmos()
     {
+        LightSwitch();
+    }
+    // Use this for initialization
+    void Start () {
+        LightSwitch();
+    }
+
+
+	
+	// Update is called once per frame
+	void Update () {
+    }
+
+    void LightSwitch()
+    {
+        bool lightOn = !FindObjectOfType<Skybox>().material.name.StartsWith("Sunny");
         lightSource = GetComponentInChildren<Light>();
         if (lightSource != null)
         {
             lightSource.enabled = lightOn;
         }
     }
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

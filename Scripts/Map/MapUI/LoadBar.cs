@@ -22,17 +22,18 @@ public class LoadBar : MonoBehaviour
         float width = backGround.sizeDelta.x * (progress / maxProgress);
         float height = backGround.sizeDelta.y;
         GetComponent<RectTransform>().sizeDelta = new Vector2(width,height);
-        if (progress < progressThres)
+        float progressToGrow = Time.deltaTime * progressSpeed * (((Random.value)+1)/2);
+        if (progress + progressToGrow < progressThres)
         {
-            GrowProgress();
+            GrowProgress(progressToGrow);
         }
         
 
     }
 
-    void GrowProgress()
+    void GrowProgress(float progressToGrow)
     {
-        progress += Time.deltaTime * progressSpeed*(Random.value);
+        progress += progressToGrow;
 
     }
 }

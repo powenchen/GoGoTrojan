@@ -6,47 +6,50 @@ using UnityEngine.UI;
 public class moveBtnOnClick : MonoBehaviour {
 
 	public Button MoveBtn;
-	public Text MoveBtnText;
     public Car car;
     public CarStatus carStatus;
+    public Sprite[] moveIcons;
+    public Image moveBtnImage;
 
 
     // Use this for initialization
     void Awake () {
-
-        if (MoveBtnText != null) {
-            MoveBtnText.text = "";
-		}
-	}
+        moveBtnImage.enabled = false;
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        if (carStatus.getMP() == carStatus.getMaxMP())
+        if (car.ableToUseSkill()) 
         {
+            moveBtnImage.enabled = true;
             if (car.GetComponent<N2OSkill>() != null)
             {
-                MoveBtnText.text = "NITRO";
+                moveBtnImage.sprite = moveIcons[0];
             }
             if (car.GetComponent<TimeStopSkill>() != null)
             {
-                MoveBtnText.text = "TIME";
+                moveBtnImage.sprite = moveIcons[1];
             }
             if (car.GetComponent<CoinAttackSkill>() != null)
             {
-                MoveBtnText.text = "CASH CHUCKER";
+                moveBtnImage.sprite = moveIcons[2];
             }
             if (car.GetComponent<FlameSkill>() != null)
             {
-                MoveBtnText.text = "DRAGON'S BREATH";
+                moveBtnImage.sprite = moveIcons[3];
             }
             if (car.GetComponent<SpearSkill>() != null)
             {
-                MoveBtnText.text = "ACHILLES";
+                moveBtnImage.sprite = moveIcons[4];
+            }
+
+            if (car.GetComponent<ShieldSkill>() != null)
+            {
+                moveBtnImage.sprite = moveIcons[5];
             }
         }
         else {
-
-            MoveBtnText.text = "";
+            moveBtnImage.enabled = false;
         }
 	}
 
@@ -54,7 +57,7 @@ public class moveBtnOnClick : MonoBehaviour {
         
         if (car.useSkill())
         {
-            MoveBtnText.text = "";
+            moveBtnImage.enabled = false;
         }
 
 	}

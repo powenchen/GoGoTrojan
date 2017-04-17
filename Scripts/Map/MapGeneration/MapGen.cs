@@ -38,6 +38,9 @@ public class MapGen : MonoBehaviour
 
     private AudioSource audio;
 
+    [Range(-1,6)]
+    public int courseDebug = -1;
+
     // Use this for initialization; used for debug
     void OnDrawGizmos ()
     {
@@ -61,7 +64,11 @@ public class MapGen : MonoBehaviour
         audio = GetComponentInChildren<AudioSource>();
         resetMap();
         StaticVariables.ResetVariables();
-        skyBoxIdx = StaticVariables.mapID;//PlayerPrefs.GetInt("CourseID");
+        skyBoxIdx = StaticVariables.skyBoxID;//TODO - use it
+        if (courseDebug >= 0 && courseDebug < 7)
+        {
+            StaticVariables.mapID = courseDebug;
+        }
         setCourse(StaticVariables.mapID);
         
             //PlayerPrefs.GetInt("PlayerID") + 2 * PlayerPrefs.GetInt("CarID");//TODO - modify this
@@ -75,13 +82,13 @@ public class MapGen : MonoBehaviour
         skillCD = 1;
         speed = 120;
         defense = 100;
-        StaticVariables.characterID = 3;
+        StaticVariables.characterID = 5;
         /***** TODO - For debug *****/
 
         initCharacter(StaticVariables.mapID, StaticVariables.carID, StaticVariables.characterID, hp,mp, atk,defense, speed, skillCD,0, true);
 
-        initCharacter(StaticVariables.mapID,2, 1, 100, 100, 100,50, 150, 5, 1, false);
-        initCharacter(StaticVariables.mapID,3, 0, 100, 100, 100,50, 150, 5, 2, false);
+        initCharacter(StaticVariables.mapID,2, 2, 100, 100, 100,50, 150, 5, 1, false);
+        initCharacter(StaticVariables.mapID,3, 4, 100, 100, 100,50, 150, 5, 2, false);
 
 
         //there are carinitDebug.Length cars; init them in time stop skill users' enemy lists 
@@ -156,29 +163,26 @@ public class MapGen : MonoBehaviour
     }
     public void setCourse(int courseID)
     {
-        
+        //disable all course except for 'courseID' course
         for (int i = 0; i < courseList.Length; ++i)
         {
-            if (i == courseID)
-            {
-                courseList[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                courseList[i].gameObject.SetActive(false);
-            }
-
+            courseList[i].gameObject.SetActive(false);
+            courseList[i].myRoad.SetActive(false);
         }
+
+        courseList[courseID].gameObject.SetActive(true);
+        courseList[courseID].myRoad.SetActive(true);
     }
 
     public void initCharacter(int courseID , int carId,int charID, float maxHP, float maxMP, float attackPower,float defense,float speed, float skillCD, int racerNum, bool isPlayer = false)
     {
         Debug.Log("generating char = " + carId);
-        Vector3 position = courseList[courseID].getStartPositions()[racerNum + 1];
-        Quaternion rotation = Quaternion.Euler(0, courseList[courseID].getStartRotation().eulerAngles.y, 0);
-        PathManager path = courseList[courseID].getPath();
+        Vector3 position = courseList[courseID].GetStartPositions()[racerNum + 1];
+        Quaternion rotation = Quaternion.Euler(0, courseList[courseID].GetStartRotation().eulerAngles.y, 0);
+        PathManager path = courseList[courseID].GetPath();
 
         Car car = Instantiate(characterList[carId], position, rotation).GetComponent<Car>();
+        //car.GetComponentInChildren<EnemyBarLookAt>().mainCameraTrans = backGroundCamera.transform;
         CarStatus carStatus = car.GetComponent<CarStatus>();
         MiniMapMark mark = Instantiate(miniMarkList[carId], position, rotation).GetComponent<MiniMapMark>();
 
@@ -254,7 +258,8 @@ public class MapGen : MonoBehaviour
 
     private void setCamera(Car car, int skyBoxID)
     {
-        mainCamera.transform.position = car.transform.position + 2* car.transform.up - 6* car.transform.forward;
+        float h = 2.3f, d = 3.8f;
+        mainCamera.transform.position = car.transform.position + (h) * car.transform.up - d* car.transform.forward;
         backGroundCamera.transform.position = mainCamera.transform.position;
         /* mainCamera.transform.rotation =  Quaternion.Euler(new Vector3(
              car.transform.rotation.eulerAngles.x,
@@ -263,8 +268,14 @@ public class MapGen : MonoBehaviour
         mainCamera.transform.rotation = car.transform.rotation;
         backGroundCamera.transform.rotation = mainCamera.transform.rotation;
 
-        mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
-        backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(car.transform);
+        Transform target = car.transform;
+        mainCamera.transform.LookAt(target);
+        backGroundCamera.transform.LookAt(target);
+        mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(target);
+        backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(target);
+
+        mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().SetHeightDsist(h,d);
+        backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().SetHeightDsist(h, d);
         if (backGroundCamera.GetComponent<Skybox>() != null)
         {
             backGroundCamera.GetComponent<Skybox>().material = skyBoxes[skyBoxID];

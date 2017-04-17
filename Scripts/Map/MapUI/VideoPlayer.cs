@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 public class VideoPlayer : MonoBehaviour
 {
-    public MovieTexture movie;
+    public MovieTexture[] movies;
     public GameObject UIStart;
+    public AudioClip audioClip;
+    private MovieTexture movie;
 	// Use this for initialization
 	void Start () {
         Restart();
@@ -14,9 +16,17 @@ public class VideoPlayer : MonoBehaviour
 
     public void Restart()
     {
+        movie = movies[StaticVariables.mapID];
         GetComponent<RawImage>().texture = movie as MovieTexture;
         AudioSource audio = GetComponent<AudioSource>();
-        audio.clip = movie.audioClip;
+        if (audioClip)
+        {
+            audio.clip = audioClip;
+        }
+        else
+        {
+            audio.clip = movie.audioClip;
+        }
         movie.Stop();
         movie.Play();
 
@@ -26,7 +36,7 @@ public class VideoPlayer : MonoBehaviour
         if (!movie.isPlaying)
         {
             UIStart.SetActive(true);
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
         AudioSource audio = GetComponent<AudioSource>();
         if (movie.isPlaying && !audio.isPlaying)
@@ -40,6 +50,6 @@ public class VideoPlayer : MonoBehaviour
     public void OnClickSkip()
     {
         UIStart.SetActive(true);
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 }

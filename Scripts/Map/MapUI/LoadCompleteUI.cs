@@ -19,7 +19,7 @@ public class LoadCompleteUI : MonoBehaviour {
         {
             startVideo.SetActive(true);
             startVideo.GetComponent<VideoPlayer>().Restart();
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 }

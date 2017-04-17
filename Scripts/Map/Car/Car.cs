@@ -83,8 +83,6 @@ public class Car : MonoBehaviour
             }
         }
 
-
-
         limitAngleAndVelocity();
     }
 
@@ -179,6 +177,15 @@ public class Car : MonoBehaviour
         rrController.ApplyBrake(maxBrakeTorque* brakeFactor);
     }
 
+    public bool notStopped()
+    {
+        return !stoppedBySkill && !stunned && !mySkill.isSkillUsing && !stopFlag;
+    }
+    public bool ableToUseSkill()
+    {
+        return status.currMP == status.getMaxMP() && notStopped();
+    }
+
     public bool useSkill()
     {
         if (!mySkill)
@@ -188,7 +195,7 @@ public class Car : MonoBehaviour
                 Debug.Log(name + " does not have a skill");
         }
         //TODO - modify this
-        if (status.currMP == status.getMaxMP() && !stoppedBySkill && !stunned && !mySkill.isSkillUsing)
+        if (ableToUseSkill())
         {
             mySkill.activateSkill();
             status.currMP = 0;
@@ -268,6 +275,7 @@ public class Car : MonoBehaviour
                 //wheel.enabled = false;
                 // fake freezing
                 wheel.setMeshRotationFlag(false);
+                wheel.setEngineSound(0);
             }
         }
     }
@@ -291,6 +299,8 @@ public class Car : MonoBehaviour
             if (wheel != null)
             {
                 wheel.setMeshRotationFlag(true);
+
+                wheel.setEngineSound(1);
             }
         }
     }

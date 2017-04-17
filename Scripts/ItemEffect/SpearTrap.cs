@@ -4,17 +4,37 @@ using UnityEngine;
 
 public class SpearTrap : TrapWeapons
 {
-    private float damageValue = 1.5f;
-
+    
+    private Vector3 myTranslate;
+    public AudioClip audioClip;
+    public ParticleSystem explosion;
+    private float damageValue = 0.15f;
+    private float pierceTime;
+    private float maxPierceTime = 3;
+    private float elapsedTime = 0;
     // Use this for initialization
+
+
     void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+        pierceTime = maxPierceTime * Random.Range(0.25f,1f);
+    }
+    // Update is called once per frame
+    void Update () {
+        if (elapsedTime < pierceTime)
+        {
+            transform.position += myTranslate * Time.deltaTime / pierceTime;
+            elapsedTime += Time.deltaTime;
+            if (elapsedTime >= pierceTime)
+            {
+                if (Random.value < 0.15)
+                {
+                    GetComponent<AudioSource>().clip = audioClip;
+                    GetComponent<AudioSource>().Play();
+                }
+            }
+        }
+
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -31,9 +51,17 @@ public class SpearTrap : TrapWeapons
             }
 
             other.GetComponent<CarStatus>().isAttackedBy(attacker, damageValue);
+            Instantiate(explosion, other.transform.position, other.transform.rotation);
             Destroy(gameObject);
         }
 
 
+    }
+    
+
+    public void SetTarget(Vector3 pos)
+    {
+
+        myTranslate = pos - transform.position;
     }
 }

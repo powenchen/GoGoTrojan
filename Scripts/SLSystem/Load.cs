@@ -53,6 +53,7 @@ public class Load : MonoBehaviour {
         }
         string characterStr = File.ReadAllText(characterDataPath);
         StaticVariables.characterData = new JSONObject(characterStr);
+
         if (!StaticVariables.cardPackData || force)
         {
             StaticVariables.cardPackData = cardPackJSONObj();

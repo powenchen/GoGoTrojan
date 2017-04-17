@@ -13,6 +13,7 @@ public class StaticVariables : MonoBehaviour
     public static float expGained = 0;
     public static int characterID = 0;
     public static int mapID = 0;
+    public static int skyBoxID = 0;
     public static int carID = 0;
     public static JSONObject saveData = null;
 
@@ -270,6 +271,40 @@ public class StaticVariables : MonoBehaviour
         ret[3] *= CDmodifier;
         ret[4] *= attackModifier;
         ret[5] *= defenseModifier;
+
+        return ret;
+    }
+
+
+    public static List<float> GetMaxCarAttributeWithCard(int carIndex)
+    {
+        List<float> ret = new List<float>();
+        float basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("hp").n;
+        float levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("hp").n;
+        float levelDiff = carData["maxLevel"].n -1;
+
+        ret.Add(levelDiff * levelModifier + basePoint);
+
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("mp").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("mp").n;
+        ret.Add(levelDiff * levelModifier + basePoint);
+
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("speed").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("speed").n;
+        ret.Add(levelDiff * levelModifier + basePoint);
+
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("CD").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("CD").n;
+        ret.Add(levelDiff * levelModifier + basePoint);
+
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("attack").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("attack").n;
+        ret.Add(levelDiff * levelModifier + basePoint);
+
+        basePoint = carData.GetField("cars").list[carIndex].GetField("baseStatus").GetField("defense").n;
+        levelModifier = carData.GetField("cars").list[carIndex].GetField("statusModifier").GetField("defense").n;
+        ret.Add(levelDiff * levelModifier + basePoint);
+
 
         return ret;
     }

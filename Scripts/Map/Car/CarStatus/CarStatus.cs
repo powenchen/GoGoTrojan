@@ -74,9 +74,12 @@ public class CarStatus : MonoBehaviour
     public bool debug = false;
 
 
-    private void Update()
+    private void FixedUpdate()
     {
-        topSpeedTimeModifier = Mathf.Clamp(topSpeedTimeModifier + accelerationRatio * Time.deltaTime, INITIAL_SPEED_TIME_MODIFIER, 1);
+        if (GetComponent<Car>().notStopped())
+        {
+            topSpeedTimeModifier = Mathf.Clamp(topSpeedTimeModifier + accelerationRatio * Time.deltaTime, INITIAL_SPEED_TIME_MODIFIER, 1);
+        }
         if (debug)
         {
             Quaternion spwanRot = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(90, 0, 0));
@@ -117,9 +120,6 @@ public class CarStatus : MonoBehaviour
 
         }
 
-        
-
-
         Car car = GetComponent<Car>();
         if (car && !car.stopFlag && !car.stoppedBySkill)
         {
@@ -133,6 +133,13 @@ public class CarStatus : MonoBehaviour
             {
                 removeSpeedDebuff();
             }
+        }
+
+        if (getHP() == 0)
+        {
+
+            Instantiate(explosionOnDead, transform.position, transform.rotation);
+            Destroy(gameObject);
         }
 
         increaseHP(hpRecover * Time.deltaTime);

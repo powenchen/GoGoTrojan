@@ -43,8 +43,11 @@ public class WheelController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        accelSound.volume = Mathf.Clamp(wheel.rpm / 10000, 0, 0.5f);
-        brakeSound.volume = Mathf.Clamp(wheel.brakeTorque / 10000, 0, 0.5f);
+        if (meshRotationEnabled)
+        {
+            accelSound.volume = Mathf.Clamp(wheel.rpm / 10000, 0, 0.5f);
+            brakeSound.volume = Mathf.Clamp(wheel.brakeTorque / 10000, 0, 0.5f);
+        }
 
     }
 
@@ -112,6 +115,12 @@ public class WheelController : MonoBehaviour
     public void setMeshRotationFlag(bool flag)
     {
         meshRotationEnabled = flag;
+    }
+
+    public void setEngineSound(float volume)
+    {
+        accelSound.volume = Mathf.Clamp(volume,0,1);
+        brakeSound.volume = Mathf.Clamp(volume, 0, 1);
     }
 
 }

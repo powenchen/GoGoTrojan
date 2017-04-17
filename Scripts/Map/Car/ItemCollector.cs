@@ -52,7 +52,7 @@ public class ItemCollector : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) 
 	{
-        if (other.GetComponent<Pickup>() != null)
+        if (other.GetComponent<PickupRotate>() != null)
         {
             if (other.GetComponent<Coin>() != null)
             {
@@ -62,7 +62,7 @@ public class ItemCollector : MonoBehaviour {
                 //PlayerPrefs.SetInt("Coins", PlayerPrefs.GetInt("Coins") + 1);
                 //coinCount += other.GetComponent<Coin>().getCoinValue();
             }
-            else if (other.GetComponent<Item>() != null)
+            else
             {
                 itemIdx = Random.Range(0, itemLists .Length);
                 /*int total = 1000;
@@ -130,7 +130,7 @@ public class ItemCollector : MonoBehaviour {
             else //traps
             {
                 Car firstCar = FindObjectOfType<RankingSystem>().GetFirstPlaceCar(GetComponent<Car>());
-                Vector3 spawnPosition = firstCar.transform.position + firstCar.transform.forward * itemPutOffset*5;
+                Vector3 spawnPosition = firstCar.transform.position + firstCar.transform.forward * itemPutOffset*2;
                 Quaternion spawnRotation = Quaternion.Euler(new Vector3(0, 0, 0));
                 GameObject weapon = Instantiate(itemLists[itemIdx], spawnPosition, spawnRotation);
 
