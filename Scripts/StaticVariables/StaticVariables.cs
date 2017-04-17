@@ -355,7 +355,7 @@ public class StaticVariables : MonoBehaviour
             // no available cards
             return;
         }
-
+       
         JSONObject newSlots = new JSONObject(JSONObject.Type.ARRAY);
         for (int i = 0; i < saveData.GetField("cars").list[carIndex].GetField("slots").list.Count; ++i)
         {
@@ -375,7 +375,7 @@ public class StaticVariables : MonoBehaviour
                     saveData.GetField("cards").GetField(attribute).list[oldCardIdx].SetField("number", Mathf.Min(oldNumber + 1, oldMaxNumber));
                 }
                 //insert new card to slot
-
+                newNumber = saveData.GetField("cards").GetField(attribute).list[cardID].GetField("number").n;
                 saveData.GetField("cards").GetField(attribute).list[cardID].SetField("number", Mathf.Max(newNumber - 1, 0));
             }
             else
@@ -460,9 +460,12 @@ public class StaticVariables : MonoBehaviour
     }
 
 
-float GetSellPrice(string rank)
+    public static float GetSellPrice(string rank)
     {
         return cardData["price"][rank].n;
     }
-
+    public static string GetMaxRecordOfMap(int mapID)
+    {
+        return saveData["records"][mapID].str;
+    }
 }

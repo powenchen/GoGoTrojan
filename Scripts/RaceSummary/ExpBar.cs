@@ -15,7 +15,6 @@ public class ExpBar : MonoBehaviour {
 
 	public Text description;
 	void Start () {
-        Load.initialize(true);
         if (debugExp != -1)
         {
             StaticVariables.expGained = debugExp;
