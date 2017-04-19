@@ -17,4 +17,10 @@ public class LoadScene : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public void LoadSceneByName(string name)
+    {
+
+        SceneManager.LoadSceneAsync(name);
+    }
 }

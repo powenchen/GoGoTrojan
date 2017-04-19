@@ -21,15 +21,14 @@ public class MapGen : MonoBehaviour
     private MiniMapMark[] marks = new MiniMapMark[maxRacerNum];
     public int racersLength = 0;
 
-    // for debug
-    public int[] carinitDebug;
+    /*public int[] carinitDebug;
     public int courseinitDebug;
     public int skyBoxInitDebug;
     private float maxHPDebug = 100;
     private float maxMPDebug = 100;
     private float maxATKDebug = 100;
     
-    public bool debugFlag = false;
+    public bool debugFlag = false;*/
 
     public itemBtnOnClick itemBtn;
     public moveBtnOnClick moveBtn;
@@ -38,58 +37,41 @@ public class MapGen : MonoBehaviour
 
     private AudioSource audio;
 
+
+
+    // for debug
     [Range(-1,6)]
     public int courseDebug = -1;
+    public Vector2[] carListsForDebug;
+    public Vector2[] charListsForDebug;
+    public float moneyWinDEBUG = -1;
+    public float moneyLoseDEBUG = -1;
+    public float expWinDEBUG = -1;
+    public float expLoseDEBUG = -1;
 
-    // Use this for initialization; used for debug
-    void OnDrawGizmos ()
-    {
-              
-        if (debugFlag)
-        {
-            skyBoxIdx = skyBoxInitDebug;
-            setCourse(courseinitDebug);
-            for (int i = 0; i < carinitDebug.Length; ++i)
-            {
-               
-                initCharacter(courseinitDebug, carinitDebug[i], carinitDebug[i], maxHPDebug, maxMPDebug, maxATKDebug,100,100,100, i, (i == 0));
-            }
-            initTimeStopskillUsers();
-
-            debugFlag = false;
-        }
-    }
     void Start()
     {
         audio = GetComponentInChildren<AudioSource>();
         resetMap();
         StaticVariables.ResetVariables();
-        skyBoxIdx = StaticVariables.skyBoxID;//TODO - use it
+        skyBoxIdx = StaticVariables.skyBoxID;
         if (courseDebug >= 0 && courseDebug < 7)
         {
             StaticVariables.mapID = courseDebug;
         }
         setCourse(StaticVariables.mapID);
+
+        //TODO - generate real code
+
+        initCharacter(StaticVariables.mapID, StaticVariables.carID, StaticVariables.characterID, 0, true);
+
+        for (int i = 0; i < carListsForDebug.Length; ++i)
+        {
+            initCharacter(StaticVariables.mapID, (int)carListsForDebug[i].x, (int)charListsForDebug[i].x, i+1, false, (int)carListsForDebug[i].y, (int)charListsForDebug[i].y);
+        }
+
         
-            //PlayerPrefs.GetInt("PlayerID") + 2 * PlayerPrefs.GetInt("CarID");//TODO - modify this
-        //PlayerPrefs.SetInt("Coins", 0);
-        float hp, mp, atk, skillCD, speed,defense;
-
-        /***** TODO - For debug *****/
-        hp = 100;
-        mp = 100;
-        atk = 100;
-        skillCD = 1;
-        speed = 120;
-        defense = 100;
-        StaticVariables.characterID = 5;
-        /***** TODO - For debug *****/
-
-        initCharacter(StaticVariables.mapID, StaticVariables.carID, StaticVariables.characterID, hp,mp, atk,defense, speed, skillCD,0, true);
-
-        initCharacter(StaticVariables.mapID,2, 2, 100, 100, 100,50, 150, 5, 1, false);
-        initCharacter(StaticVariables.mapID,3, 4, 100, 100, 100,50, 150, 5, 2, false);
-
+        
 
         //there are carinitDebug.Length cars; init them in time stop skill users' enemy lists 
         initTimeStopskillUsers();
@@ -174,7 +156,7 @@ public class MapGen : MonoBehaviour
         courseList[courseID].myRoad.SetActive(true);
     }
 
-    public void initCharacter(int courseID , int carId,int charID, float maxHP, float maxMP, float attackPower,float defense,float speed, float skillCD, int racerNum, bool isPlayer = false)
+    public void initCharacter(int courseID , int carId,int charID, int racerNum, bool isPlayer, int carLV = -1, int charLV = -1)
     {
         Debug.Log("generating char = " + carId);
         Vector3 position = courseList[courseID].GetStartPositions()[racerNum + 1];
@@ -182,38 +164,66 @@ public class MapGen : MonoBehaviour
         PathManager path = courseList[courseID].GetPath();
 
         Car car = Instantiate(characterList[carId], position, rotation).GetComponent<Car>();
+        car.myCharID = charID;
         //car.GetComponentInChildren<EnemyBarLookAt>().mainCameraTrans = backGroundCamera.transform;
         CarStatus carStatus = car.GetComponent<CarStatus>();
         MiniMapMark mark = Instantiate(miniMarkList[carId], position, rotation).GetComponent<MiniMapMark>();
-
+        //InitCarStatus(carStatus, carId, charID);
         if (charID != 0)
-        {
-            DestroyImmediate(car.GetComponent<N2OSkill>());
-        }
-        if (charID != 1)
-        {
-            DestroyImmediate(car.GetComponent<TimeStopSkill>());
-        }
-        if (charID != 2)
-        {
-            DestroyImmediate(car.GetComponent<CoinAttackSkill>());
-        }
-        if (charID != 3)
         {
             DestroyImmediate(car.GetComponent<FlameSkill>());
         }
+        if (charID != 1)
+        {
+            DestroyImmediate(car.GetComponent<CoinAttackSkill>());
+        }
+        if (charID != 2)
+        {
+            DestroyImmediate(car.GetComponent<ShieldSkill>());
+        }
+        if (charID != 3)
+        {
+            DestroyImmediate(car.GetComponent<TimeStopSkill>());
+        }
         if (charID != 4)
+        {
+            DestroyImmediate(car.GetComponent<N2OSkill>());
+        }
+        if (charID != 5)
         {
             DestroyImmediate(car.GetComponent<SpearSkill>());
         }
 
+
         //init car params
-        carStatus.attackInitialize(attackPower);
-        carStatus.HPInitialize(maxHP);
-        carStatus.MPInitialize(maxMP);
-        carStatus.skillCDInitialize(skillCD);
-        carStatus.setTopSpeed(basicTopSpeed * (1+(speed / 1000f)));//speed = 100pt = 1.1times
-        carStatus.defenseBase = defense;
+        // return [hp, mp, speed,CD, attack, defense]
+        if (isPlayer)
+        {
+            carLV = (int)StaticVariables.GetCurrentCarLevel(carId);
+            charLV = (int)StaticVariables.GetCurrentCharLevel(charID);
+        }
+        List<float> carAbility = StaticVariables.GetCurrentCarAttribute(carId,carLV);
+        List<float> charAbility = StaticVariables.GetCurrentCharAttribute(charID,charLV);
+        carStatus.HPInitialize(carAbility[0]+charAbility[0]);
+        carStatus.MPInitialize(carAbility[1] + charAbility[1]);
+        carStatus.setTopSpeed(basicTopSpeed * (1 + ((carAbility[2] + charAbility[2] )/ 1000f)));//speed = 100pt = 1.1times
+        carStatus.skillCDInitialize(carAbility[3] + charAbility[3]);
+        carStatus.attackInitialize(carAbility[4] + charAbility[4]);
+        carStatus.defenseBase = carAbility[5] + charAbility[5];
+        if (isPlayer)//set cards on player
+        {
+            for (int i = 0; i < StaticVariables.saveData["cars"][carId]["slots"].list.Count; ++i)
+            {
+                if (StaticVariables.saveData["cars"][carId]["slots"][i].n != -1)
+                {
+                    string cardAttr = StaticVariables.GetCarSlotAttribute(carId, i);
+                    int cardID = (int)StaticVariables.saveData["cars"][carId]["slots"][i].n;
+                    carStatus.SetCardOnCar(cardAttr, cardID);
+                }
+            }
+            
+        }
+
 
         mark.transform.parent = miniMap.transform;
         marks[racerNum] = mark;
@@ -221,7 +231,7 @@ public class MapGen : MonoBehaviour
         racersLength++;
         mark.transform.localPosition = new Vector3(0, 0, 0);
         mark.MyCar = car.transform;
-        car.GetComponentInChildren<EnemyBarLookAt>().mainCameraTrans = backGroundCamera.transform;
+        //car.GetComponentInChildren<EnemyBarLookAt>().mainCameraTrans = backGroundCamera.transform;
 
         if (car.GetComponent<TimeStopSkill>() != null)
         {
@@ -271,11 +281,11 @@ public class MapGen : MonoBehaviour
         Transform target = car.transform;
         mainCamera.transform.LookAt(target);
         backGroundCamera.transform.LookAt(target);
-        mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(target);
-        backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().setTarget(target);
+        mainCamera.GetComponent<EnemyBarLookAt>().setTarget(target);
+        backGroundCamera.GetComponent<EnemyBarLookAt>().setTarget(target);
 
-        mainCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().SetHeightDsist(h,d);
-        backGroundCamera.GetComponent<UnityStandardAssets.Utility.SmoothFollow>().SetHeightDsist(h, d);
+        mainCamera.GetComponent<EnemyBarLookAt>().SetHeightDist(h,d);
+        backGroundCamera.GetComponent<EnemyBarLookAt>().SetHeightDist(h, d);
         if (backGroundCamera.GetComponent<Skybox>() != null)
         {
             backGroundCamera.GetComponent<Skybox>().material = skyBoxes[skyBoxID];

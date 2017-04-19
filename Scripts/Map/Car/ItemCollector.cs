@@ -41,7 +41,11 @@ public class ItemCollector : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+        //AI uses item once obtained
+        if (GetComponent<AIScript>() != null)
+        {
+            useItem();
+        }
 	}
 
 	// we have 4 kinds of collectable pickups

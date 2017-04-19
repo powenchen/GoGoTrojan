@@ -9,7 +9,7 @@ public class CarStatus : MonoBehaviour
     public float maxHPBase = 100;
     public float maxHPModifier = 1;
 
-    public float currMP = 100;
+    public float currMP = 0;
     public float maxMPBase = 100;
     public float maxMPModifier = 1;
 
@@ -42,6 +42,7 @@ public class CarStatus : MonoBehaviour
     private float speedDebuffTime = 2;
     private bool isSpeedDebuffing = false;
     private float speedDebuffTimer = 0;
+    private float speedDebuffRate = 1;
 
     //card abilities
     public float hpRecover = 0; // recover how many points per second
@@ -66,6 +67,19 @@ public class CarStatus : MonoBehaviour
     public float receivedExpModifier = 1;
     public float receivedCoinModifier = 1;
 
+    public float speedReductionAttack = 0;
+
+    public float accuracy = 1;
+    public float evasion = 0;
+
+    public int shieldNumber = 0;
+
+    public float mpCostReduction = 0;
+
+    /*
+    public int speedUpNumbers = 0;
+    public Vector2[] speedUpThres = new Vector2[3];
+    */
 
     // Particles and prefabs
     public ParticleSystem reviveAnime;
@@ -73,6 +87,160 @@ public class CarStatus : MonoBehaviour
     public GameObject stunAnime;
     public bool debug = false;
 
+    public void SetCardOnCar(string cardAttr, int cardId)
+    {
+        JSONObject numbers = StaticVariables.cardData[cardAttr][cardId]["attributes"];
+        string cardName = StaticVariables.cardData[cardAttr][cardId]["name"].str;
+        if (cardAttr.Equals("ATK"))
+        {
+            if (cardName.StartsWith("atkIncrease"))
+            {
+                attackModifier += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("lifeSteal"))
+            {
+                lifeStealAbility += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("poison"))
+            {
+                poisonAbility += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("stun"))
+            {
+                stunAbility = true;
+                return;
+            }
+            //discard
+            if (cardName.StartsWith("singleToGlobal"))
+            {
+                //implement
+                globalAttackChance += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("speedReuction"))
+            {
+                speedReductionAttack += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("crit"))
+            {
+                criticalChance += numbers.list[0].n;
+                criticalDamage += numbers.list[1].n-1;
+                return;
+            }
+            if (cardName.StartsWith("trade"))
+            {
+                maxHPModifier -= numbers.list[0].n;
+                attackModifier += numbers.list[1].n;
+                return;
+            }
+            if (cardName.StartsWith("increaseAccu"))
+            {
+                accuracy += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("atkPen"))
+            {
+                armorPenetration += numbers.list[0].n;
+                return;
+            }
+
+        }
+        else if (cardAttr.Equals("DEF"))
+        {
+            if (cardName.StartsWith("increaseHP"))
+            {
+                maxHPModifier += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("hpRecover"))
+            {
+                hpRecover += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("damRedction"))
+            {
+                damageReduction += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("reflect"))
+            {
+                reflectAbility = true;
+                return;
+            }
+            if (cardName.StartsWith("revive"))
+            {
+                reviveAbility += (int)numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("startWithShield"))
+            {
+                shieldNumber += (int)numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("defIncrease"))
+            {
+                defenseModifier += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("evationIncrease"))
+            {
+                evasion += numbers.list[0].n;
+                return;
+            }
+        }
+        else if (cardAttr.Equals("SPE"))
+        {
+            if (cardName.StartsWith("mpIncrease"))
+            {
+                maxMPModifier += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("CDIncrease"))
+            {
+                skillCDModifier += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("mpCostReduction"))
+            {
+                mpCostReduction += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("speedIncrease"))
+            {
+                topSpeedModifier += numbers.list[0].n;
+                return;
+            }
+            if (cardName.StartsWith("coinIncrease"))
+            {
+                receivedCoinModifier += numbers.list[0].n;
+                StaticVariables.coinModifier += receivedCoinModifier;
+                return;
+            }
+            if (cardName.StartsWith("expIncrease"))
+            {
+                receivedExpModifier += numbers.list[0].n;
+                StaticVariables.coinModifier += receivedExpModifier;
+                return;
+            }
+            /*
+            if (cardName.StartsWith("healthBelow"))
+            {
+                //implement
+                speedUpThres[speedUpNumbers++] = new Vector2(numbers.list[0].n, numbers.list[1].n);
+                return;
+            }*/
+            if (cardName.StartsWith("tradeHealth"))
+            {
+                maxHPModifier -= numbers.list[0].n;
+                topSpeedModifier += numbers.list[1].n;
+                return;
+            }
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -173,7 +341,12 @@ public class CarStatus : MonoBehaviour
 
     public void decreaseHP(float point, CarStatus attacker = null)
     {
-        float decreasedAmount = Mathf.Min(point * Mathf.Max(0,1-damageReduction), currHP);
+        if (shieldNumber > 0)
+        {
+            shieldNumber--;
+            return;
+        }
+        float decreasedAmount = Mathf.Min(point * Mathf.Max(0, 1 - damageReduction), currHP);
 
         // it is possible being attack by yourself if your poison ability is reflected
         if (attacker != null && attacker != this && attacker.lifeStealAbility > 0)
@@ -292,14 +465,15 @@ public class CarStatus : MonoBehaviour
 
     public void speedDebuff()
     {
-        topSpeedModifier = 0.5f;
+        topSpeedModifier *= speedDebuffRate;
         isSpeedDebuffing = true;
         speedDebuffTimer = 0;
     }
 
     public void removeSpeedDebuff()
     {
-        topSpeedModifier = 1;
+        topSpeedModifier /= speedDebuffRate;
+        speedDebuffRate = 1;
         isSpeedDebuffing = false;
         speedDebuffTimer = 0;
     }
@@ -331,6 +505,12 @@ public class CarStatus : MonoBehaviour
 
     public void isAttackedBy(CarStatus attacker, float weaponModifier = 1)
     {
+        float rng = Random.value;
+        if (rng > (attacker.accuracy - evasion))
+        {
+            //attack is evaded
+            return;
+        }
         // check attacker abilities(poison, liseSteal, stun)
         // check self ability(reflect == true)
         float reflectedDamage = 0;//give attacker damage(if has reflect ability)
@@ -361,6 +541,11 @@ public class CarStatus : MonoBehaviour
                 Transform spawnTrans = negativeEffectReciever.transform;
                 GameObject stunObj = Instantiate(stunAnime, spawnTrans.position + new Vector3(0, 1.5f, 0), spawnTrans.rotation, spawnTrans);
                 stunObj.GetComponent<StunningStar>().setLifetime(negativeEffectReciever.stunningTime);
+            }
+            if (attacker.speedReductionAttack != 0)
+            {
+                negativeEffectReciever.speedDebuffRate = Mathf.Clamp(1 - attacker.speedReductionAttack, 0, 1);
+                negativeEffectReciever.isSpeedDebuffing = true;
             }
 
             if (reflectedDamage > 0)

@@ -9,6 +9,7 @@ public class VideoPlayer : MonoBehaviour
     public GameObject UIStart;
     public AudioClip audioClip;
     private MovieTexture movie;
+    
 	// Use this for initialization
 	void Start () {
         Restart();
@@ -43,7 +44,6 @@ public class VideoPlayer : MonoBehaviour
         {
             audio.Play();
         }
-
         
 	}
 

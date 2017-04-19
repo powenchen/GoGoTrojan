@@ -44,10 +44,21 @@ public class RaceSummary : MonoBehaviour {
 			Destroy (character1);
 		}
         */
-        coin = StaticVariables.coinNumber;//PlayerPrefs.GetInt ("Coins");
+        
+        coin =(int)( StaticVariables.coinNumber *(1+ StaticVariables.coinModifier));//PlayerPrefs.GetInt ("Coins");
 		rank = StaticVariables.ranking;
         time = StaticVariables.raceTimeStr;//PlayerPrefs.GetString ("TotalTime");
-        Debug.Log("rank = "+rank);    
+        if (StaticVariables.ranking == 1)//wins
+        {
+            string[] timeSplit = time.Split(':');
+            float record = float.Parse(timeSplit[0]) * 60 + float.Parse(timeSplit[1]);
+            StaticVariables.SetMaxRecordOfMap(StaticVariables.mapID, record);
+        }
+        else {
+            Debug.Log("ranking = " + StaticVariables.ranking);
+        }
+
+        Save.saveState();
         /*
 		if (rank == 1) {
 			grade.text = "A";
@@ -78,7 +89,7 @@ public class RaceSummary : MonoBehaviour {
     }
 
     public void ToMainMenu () {
-		SceneManager.LoadScene ("MainMenu");
+		SceneManager.LoadSceneAsync("MapPickUp");
 	}
 
 	public void ToStore() {

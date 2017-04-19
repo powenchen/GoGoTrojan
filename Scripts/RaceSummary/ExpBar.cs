@@ -9,6 +9,7 @@ public class ExpBar : MonoBehaviour {
     private float speed = 100;
     public float totalTime = 3;
 	public float maxWidth = 500;
+    public bool isFinished = false;
     // Use this for initialization
 
     public float accExp = 0;
@@ -19,7 +20,7 @@ public class ExpBar : MonoBehaviour {
         {
             StaticVariables.expGained = debugExp;
         }
-        pointsToGain = StaticVariables.expGained;
+        pointsToGain = StaticVariables.expGained*(1+StaticVariables.expModifier);
 
         speed = StaticVariables.expGained / totalTime;
         description.text = "Level = " + StaticVariables.GetCharacterAttribute(StaticVariables.characterID).GetField("level").n;
@@ -29,7 +30,10 @@ public class ExpBar : MonoBehaviour {
 		description.text += "\nDefense = " + StaticVariables.GetCharacterAttribute (StaticVariables.characterID).GetField ("defense").n;
 		description.text += "\nSpeed = " + StaticVariables.GetCharacterAttribute (StaticVariables.characterID).GetField ("speed").n;
 		description.text += "\nMP Regen. = " + StaticVariables.GetCharacterAttribute (StaticVariables.characterID).GetField ("CD").n;
-
+        foreach (Button btn in FindObjectsOfType<Button>())
+        {
+            btn.interactable = false;
+        }
 
     }
 	
@@ -44,7 +48,14 @@ public class ExpBar : MonoBehaviour {
         {
             ExpGrow();
         }
-        
+        else if(!isFinished)
+        {
+            isFinished = true;
+            foreach (Button btn in FindObjectsOfType<Button>())
+            {
+                btn.interactable = true;
+            }
+        }
 
     }
 

@@ -8,34 +8,51 @@ public class MapPickUp : MonoBehaviour {
 
 	public Button confirmText;
 	public Button backText;
-	public Button route1;
-	public Button route2;
+	public Text title;
+	public Text value;
 	public Image routePreview;
 	public static int routePicked;
-	public Sprite routePreview1;
-	public Sprite routePreview2;
-	public Text routePreviewName;
+	public Sprite star;
+	public GameObject starsPan;
+	public Button[] maps;
+    public Sprite[] miniMaps;
+    public Sprite[] sMaps;
+    private string[] titles = {"D o w n t o w n  L A", "V i t e r b i", "M a r s h a l l", "K e c k", "C i n e m a", "G o u l d", "T r o j a n" };
+	private int[] difficulty = { 1, 2, 1, 3, 4, 3, 5 };
+	private string[] distance = { "Medium", "Long", "Short", "Short", "Medium", "Short", "Long" };
+    public Sprite lockSprite;
+    // Use this for initialization
+    void Start () {
+        for (int i = 0; i < maps.Length; ++i)
+        {
+            if (i > StaticVariables.saveData["progress"].n + 1)
+            {
+                maps[i].GetComponent<Image>().sprite = lockSprite;
+                maps[i].interactable = false;
+            }
+            else
+            {
+                maps[i].GetComponent<Image>().sprite = sMaps[i];
+                maps[i].interactable = true;
+            }
 
-	// Use this for initialization
-	void Start () {
-		confirmText = confirmText.GetComponent<Button> ();
+        }
+        confirmText = confirmText.GetComponent<Button> ();
 		backText = backText.GetComponent<Button> ();
-		route1 = route1.GetComponent<Button> ();
-		route2 = route2.GetComponent<Button> ();
 		routePreview = routePreview.GetComponent<Image> ();
-		routePreviewName = routePreviewName.GetComponent<Text> ();
-		routePreview.sprite = routePreview1;
-		routePicked = 1;
+		routePicked = 0;
+		ChangeMapDetail (routePicked);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
+
+
 
 	public void Confirm() {
         //PlayerPrefs.SetInt("CourseID", routePicked-1);
-        StaticVariables.mapID = routePicked - 1;
+        StaticVariables.mapID = routePicked;
 
         SceneManager.LoadScene ("CharacterPickUp");
 	}
@@ -44,24 +61,28 @@ public class MapPickUp : MonoBehaviour {
 		SceneManager.LoadScene ("Story");
 	}
 
-	public void PickRoute1() {
-		routePicked = 1;
-		Debug.Log ("You have picked route 1");
-		route1.GetComponent<Outline> ().enabled = true;
-		route2.GetComponent<Outline> ().enabled = false;
-		routePreview.sprite = routePreview1;
-		routePreviewName.text = "Route 1";
-
+	public void PickRouteAt(int mapNumber) {
+		routePicked = mapNumber;
+		ChangeMapDetail (routePicked);
 	}
 
-	public void PickRoute2() {
-		routePicked = 2;
-		Debug.Log ("You have picked route 2");
-		route2.GetComponent<Outline> ().enabled = true;
-		route1.GetComponent<Outline> ().enabled = false;
-		routePreview.sprite = routePreview2;
-		routePreviewName.text = "Route 2";
+	private void ShowStarsFor(int number) {
+		for(int i = 0; i < 5; i++) {
+			starsPan.GetComponentsInChildren<Image> () [i].sprite = null;
+		}
+		for(int i = 0; i < number; i++) {
+			starsPan.GetComponentsInChildren<Image> () [i].sprite = star;
+		}
 	}
 
+	private void ChangeMapDetail(int mapNumber) {
+		title.text = titles[mapNumber];
+		routePreview.sprite = miniMaps [mapNumber];
+		ShowStarsFor (difficulty[mapNumber]);
+		string valueStr = distance[mapNumber] + "\n";
+
+		valueStr += StaticVariables.GetMaxRecordOfMap(mapNumber);
+		value.text = valueStr;
+	}
 
 }

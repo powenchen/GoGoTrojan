@@ -36,7 +36,15 @@ public class StatBtnOnClick : MonoBehaviour
             return;
         }
         //clean Car flags on leaving la_large scene; 
-        SceneManager.LoadScene("RaceSummary");
+        Debug.Log("StaticVariables.firstClear = " + StaticVariables.firstClear);
+        if (StaticVariables.firstClear)
+        {
+            SceneManager.LoadScene("EndScene");
+        }
+        else
+        {
+            SceneManager.LoadScene("RaceSummary");
+        }
     }
 
     public void PlayAgainOnClick()

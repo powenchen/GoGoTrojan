@@ -23,7 +23,7 @@ public class Car : MonoBehaviour
 
 
     //private float stuckSpeedThres = 3;
-
+    public int myCharID;
     private Skill mySkill;
 
     /* public float myHP = 100;
@@ -183,7 +183,8 @@ public class Car : MonoBehaviour
     }
     public bool ableToUseSkill()
     {
-        return status.currMP == status.getMaxMP() && notStopped();
+        float mpComsumption = Mathf.Clamp(1-status.mpCostReduction,0,1)*StaticVariables.characterData["characters"][myCharID]["mpComsumption"].n;
+        return status.currMP >= mpComsumption && notStopped();
     }
 
     public bool useSkill()
@@ -198,7 +199,8 @@ public class Car : MonoBehaviour
         if (ableToUseSkill())
         {
             mySkill.activateSkill();
-            status.currMP = 0;
+            float mpComsumption = Mathf.Clamp(1 - status.mpCostReduction, 0, 1) * StaticVariables.characterData["characters"][myCharID]["mpComsumption"].n;
+            status.currMP -= mpComsumption;
             return true;
         }
         return false;
